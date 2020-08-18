@@ -22,6 +22,7 @@ stlStrReqErr = "Request error",
 stlStrNotSelected = "Not selected",
 stlStrNoSubtLoaded = "No subtitles were loaded",
 stlStrInvalidUrl = "Invalid subtitle URL";
+
 var userLang = navigator.language || navigator.userLanguage;
 if (userLang.includes("ko")) {
     stlStrUnsupported = "유튜브 동영상 페이지(데스크탑/모바일)에서 실행하세요. (iframe, embed 등 미지원)",
@@ -255,6 +256,7 @@ function stlLoadSubtitleFromUrl(url, unselectDbSelect) {
 
 function showMessage(str) {
     stlStatus.innerHTML = "| " + str;
+    console.log("YTSubtitleLoader: " + str);
     clearTimeout(timer);
     timer = setTimeout(function() {
         stlStatus.innerHTML = "";
