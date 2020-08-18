@@ -1,3 +1,4 @@
+function init() {
 var stlServerUrl = "https://ytsubtitleloader.tk";
 
 var stlStrUnsupported = "Run this script in a YouTube video page. (desktop / mobile - iframe, embed, etc are not supported)",
@@ -299,3 +300,6 @@ function isSafari() {
 }
 
 console.log("YTSubtitleLoader: Initialization complete");
+}
+
+init();
