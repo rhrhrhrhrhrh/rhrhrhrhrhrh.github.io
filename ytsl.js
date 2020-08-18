@@ -171,6 +171,7 @@ stlDbRefreshBtn.onclick = function () {
     stlDbSelectPlaceholder.text = stlStrLoading;
     stlDbSelect.disabled = true;
     stlDbSelect.appendChild(stlDbSelectPlaceholder);
+    stlDbSelect.selectedIndex = 0;
     stlLoadDb();
 };
 stlContainer.appendChild(stlDbRefreshBtn);
