@@ -1,4 +1,3 @@
-(function () {
 var stlServerUrl = "https://ytsubtitleloader.tk";
 
 var stlStrUnsupported = "Run this script in a YouTube video page. (desktop / mobile - iframe, embed, etc are not supported)",
@@ -182,12 +181,14 @@ var stlUnloadBtn = document.createElement("button");
 stlUnloadBtn.textContent = stlStrUnload;
 stlUnloadBtn.className = "stlLabel stlButton";
 stlUnloadBtn.onclick = function () {
-    try {
-        video.textTracks[video.textTracks.length - 1].mode = "hidden";
-    } catch (e) {
-        console.log(e);
-        showMessage(stlStrNoSubtLoaded);
-        return;
+    if (!isSafari()) {
+        try {
+            video.textTracks[video.textTracks.length - 1].mode = "hidden";
+        } catch (e) {
+            console.log(e);
+            showMessage(stlStrNoSubtLoaded);
+            return;
+        }
     }
     videoSubtitle.remove();
     showMessage(stlStrUnloaded);
@@ -202,7 +203,7 @@ stlLoadDb();
 
 function stlLoadDb() {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", "https://ytsubtitleloader.tk/db/" + parseVideoId(), true);
+    xhr.open("GET", stlServerUrl + "/db/" + parseVideoId(), true);
     xhr.timeout = 10000;
     xhr.send();
     xhr.onload = function() {
@@ -283,6 +284,18 @@ function stlShowSubtitle(src, unselectDbSelect) {
     video.textTracks[video.textTracks.length - 1].mode = "showing";
     if (unselectDbSelect) stlDbSelect.selectedIndex = 0;
 };
+    
+function isSafari() {
+    var ua = navigator.userAgent.toLowerCase(); 
+    if (ua.indexOf('safari') != -1) { 
+        if (ua.indexOf('chrome') > -1) {
+            return false;
+        } else {
+            return true;
+        }
+    } else {
+        return false;
+    }
+}
 
 console.log("YTSubtitleLoader: Initialization complete");
-})();
