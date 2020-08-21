@@ -206,7 +206,7 @@ stlLoadDb();
 function stlLoadDb() {
     var xhr = new XMLHttpRequest();
     xhr.open("GET", stlServerUrl + "/db/" + parseVideoId(), true);
-    xhr.timeout = 10000;
+    xhr.timeout = 25000;
     xhr.send();
     xhr.onload = function() {
         if (xhr.status == 200) {
@@ -236,7 +236,7 @@ function stlLoadDb() {
 function stlLoadSubtitleFromUrl(url, unselectDbSelect) {
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
-    xhr.timeout = 10000;
+    xhr.timeout = 25000;
     xhr.send();
     xhr.onload = function() {
         if (xhr.status == 200) {
