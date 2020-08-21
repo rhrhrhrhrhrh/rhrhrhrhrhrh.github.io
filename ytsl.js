@@ -4,7 +4,7 @@ var stlServerUrl = "https://ytsubtitleloader.tk";
 var stlStrUnsupported = "Run this script in a YouTube video page. (desktop / mobile - iframe, embed, etc are not supported)",
 stlStrSelectVttFile = "Select a file",
 stlStrSubtitleLoaded = "Subtitle loaded",
-stlStrEnterSubtAddr = "Enter a URL",
+stlStrEnterSubtAddr = "Enter URL",
 stlStrLoad = "Load",
 stlStrApply = "Apply",
 stlStrEmptyAddrAlert = "Enter a valid URL",
@@ -20,7 +20,7 @@ stlStrServErr = "Server error",
 stlStrReqTimeout = "Request timed out",
 stlStrReqErr = "Request error",
 stlStrNotSelected = "Not selected",
-stlStrNoSubtLoaded = "No subtitles were loaded",
+stlStrNoSubtLoaded = "No subtitle was loaded",
 stlStrInvalidUrl = "Invalid subtitle URL";
 
 var userLang = navigator.language || navigator.userLanguage;
