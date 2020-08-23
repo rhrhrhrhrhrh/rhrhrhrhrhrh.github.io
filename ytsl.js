@@ -136,7 +136,7 @@
         stlUrlInputBtn.onclick = function () {
             var str = prompt(stlStrEnterSubtAddr);
             if (!str) {
-                stlShowMessage(stlStrEmptyAddrAlert);
+                if (str == "") stlShowMessage(stlStrEmptyAddrAlert);
                 return;
             };
             stlLoadSubtitleFromUrl(str, true);
@@ -151,6 +151,7 @@
         stlFontSizeInputBtn.className = "stlLabel stlButton";
         stlFontSizeInputBtn.onclick = function () {
             var str = prompt(stlStrEnterFontSizeDialog);
+            if (str == null) return;
             videoSubtitleStyle.innerHTML = "::cue { font-size: " + (isNaN(str) ? str : str + "px") + "; }";
             stlShowMessage(stlStrFontSizeChanged);
         };
