@@ -22,7 +22,9 @@
         stlStrNoSubtLoaded = "No subtitle was loaded",
         stlStrInvalidUrl = "Invalid subtitle URL",
         stlStrAddSubt = "Add subtitle",
-        stlStrInvalidSubtFormat = "Invalid subtitle format";
+        stlStrInvalidSubtFormat = "Invalid subtitle format",
+        stlStrCancel = "Cancel",
+        stlStrCanceled = "Canceled";
 
     var userLang = navigator.language || navigator.userLanguage;
     if (userLang.includes("ko")) {
@@ -48,7 +50,9 @@
             stlStrNoSubtLoaded = "로드된 자막이 없습니다.",
             stlStrInvalidUrl = "잘못된 자막 URL",
             stlStrAddSubt = "자막 추가",
-            stlStrInvalidSubtFormat = "올바르지 않은 자막 형식";
+            stlStrInvalidSubtFormat = "올바르지 않은 자막 형식",
+            stlStrCancel = "취소",
+            stlStrCanceled = "취소됨";
     }
 
     var videoSubtitle = document.createElement("track");
@@ -186,16 +190,7 @@
         var stlDbRefreshBtn = document.createElement("button");
         stlDbRefreshBtn.textContent = stlStrRefresh;
         stlDbRefreshBtn.className = "stlLabel stlButton";
-        stlDbRefreshBtn.onclick = function () {
-            stlDbSelect.innerHTML = "";
-            stlDbSelectPlaceholder.text = stlStrLoading;
-            stlDbSelect.disabled = true;
-            stlDbSelect.appendChild(stlDbSelectPlaceholder);
-            stlDbSelect.selectedIndex = 0;
-            stlDbSelectPrevSelect = stlDbSelect.selectedIndex;
-            stlDbSelectAddBtn.selected = false;
-            stlLoadDb();
-        };
+        stlDbRefreshBtn.onclick = stlDbRefresh;
         stlContainer.appendChild(stlDbRefreshBtn);
 
         var stlSeparator3 = stlSeparator.cloneNode(true);
@@ -230,9 +225,18 @@
         function stlLoadDb() {
             var xhr = new XMLHttpRequest();
             xhr.open("GET", stlServerUrl + "/db/" + parseVideoId(), true);
-            xhr.timeout = 25000;
+            //xhr.timeout = 25000;
             xhr.send();
+            stlDbRefreshBtn.textContent = stlStrCancel;
+            stlDbRefreshBtn.onclick = function () {
+                xhr.abort();
+                stlDbSelectPlaceholder.text = stlStrCanceled;
+                stlDbRefreshBtn.textContent = stlStrRefresh;
+                stlDbRefreshBtn.onclick = stlDbRefresh;
+            };
             xhr.onload = function () {
+                stlDbRefreshBtn.textContent = stlStrRefresh;
+                stlDbRefreshBtn.onclick = stlDbRefresh;
                 if (xhr.status == 200) {
                     stlDbSelect.disabled = false;
                     stlDbSelectPlaceholder.text = stlStrNotSelected;
@@ -253,10 +257,14 @@
             xhr.ontimeout = function (e) {
                 console.log("YTSubtitleLoader: " + e.message);
                 stlDbSelectPlaceholder.text = stlStrReqTimeout;
+                stlDbRefreshBtn.textContent = stlStrRefresh;
+                stlDbRefreshBtn.onclick = stlDbRefresh;
             };
             xhr.onerror = function (e) {
                 console.log("YTSubtitleLoader: " + e.message);
                 stlDbSelectPlaceholder.text = stlStrReqErr;
+                stlDbRefreshBtn.textContent = stlStrRefresh;
+                stlDbRefreshBtn.onclick = stlDbRefresh;
             };
         };
 
@@ -285,6 +293,17 @@
             } else {
                 return false;
             }
+        }
+        
+        function stlDbRefresh() {
+            stlDbSelect.innerHTML = "";
+            stlDbSelectPlaceholder.text = stlStrLoading;
+            stlDbSelect.disabled = true;
+            stlDbSelect.appendChild(stlDbSelectPlaceholder);
+            stlDbSelect.selectedIndex = 0;
+            stlDbSelectPrevSelect = stlDbSelect.selectedIndex;
+            stlDbSelectAddBtn.selected = false;
+            stlLoadDb();
         }
     }
 
