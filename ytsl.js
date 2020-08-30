@@ -68,6 +68,8 @@ var video = document.getElementsByTagName("video")[0];
 var stlDbSelect = document.createElement("select");
 var stlDbSelectPrevSelect = 0;
 var stlRanJsSubtOnce = false;
+var videoSubtitleStyle = document.createElement("style");
+videoSubtitleStyle.innerHTML = "::cue {  }";
 
 stlInitUi();
 console.log("YTSubtitleLoader: Initialization complete");
@@ -103,8 +105,6 @@ function stlInitUi() {
     videoSubtitleStyleForFontSize.innerHTML = "::cue {  }";
     document.head.appendChild(videoSubtitleStyleForFontSize);
 
-    var videoSubtitleStyle = document.createElement("style");
-    videoSubtitleStyle.innerHTML = "::cue {  }";
     document.head.appendChild(videoSubtitleStyle);
 
     var stlContainer = document.createElement("div");
@@ -328,10 +328,10 @@ function stlInitUi() {
         stlDbSelectAddBtn.selected = false;
         stlLoadDb();
     }
+}
 
-    function setVideoSubtitleStyle(style) {
-        videoSubtitleStyle.innerText = "::cue { " + style + " };"
-    }
+function setVideoSubtitleStyle(style) {
+    videoSubtitleStyle.innerText = "::cue { " + style + " };"
 }
 
 function stlLoadSubtitleFromUrl(url, unselectDbSelect) {
