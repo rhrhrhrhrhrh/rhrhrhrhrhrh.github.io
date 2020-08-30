@@ -88,7 +88,7 @@
         var stlDbSubtitles;
 
         var stlStyle = document.createElement("style");
-        stlStyle.innerHTML = ".stlLabel { float: left; font-size: 16px; margin-left: 2px; margin-right: 2px; } .stlLink { color: black !important; text-decoration: none !important; } .stlButton { background: none !important; border: none; padding: 0 !important; margin-top: 0 !important; margin-bottom: 0 !important; cursor: pointer; }";
+        stlStyle.innerHTML = '.stlLabel { float: left; font-size: 16px; margin-left: 2px; margin-right: 2px; } .stlLink { color: black !important; text-decoration: none !important; } .stlButton { background: none !important; border: none; padding: 0 !important; margin-top: 0 !important; margin-bottom: 0 !important; cursor: pointer; } ::cue { display: inline-block; white-space: pre-wrap; background: rgba(8, 8, 8, 0.75) none repeat scroll 0% 0%; font-size: 33.0222px; color: #ffffff; fill: #ffffff; font-family: "YouTube Noto", Roboto, "Arial Unicode Ms", Arial, Helvetica, Verdana, "PT Sans Caption", sans-serif; }';
         if (userLang.includes("ko")) {
             stlStyle.innerHTML += ".stlLabelEngOnly { margin-top: 1px; }";
         }
@@ -143,6 +143,7 @@
                 if (str == "") stlShowMessage(stlStrEmptyAddrAlert);
                 return;
             };
+            if (!str.includes("http://") && !str.includes("https://")) str = "https://ytsubtitleloader.tk/db/" + parseVideoId() + "/" + str;
             stlLoadSubtitleFromUrl(str, true);
         };
         stlContainer.appendChild(stlUrlInputBtn);
