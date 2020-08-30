@@ -25,7 +25,8 @@ var stlServerUrl = "https://ytsubtitleloader.tk",
     stlStrInvalidSubtFormat = "Invalid subtitle format",
     stlStrCancel = "Cancel",
     stlStrCanceled = "Canceled",
-    stlStrConfirmJs = "Do you want this subtitle to run JavaScript?\nThis allows the text to be styled, but it also poses security risks.";
+    stlStrConfirmJs = "Do you want this subtitle to run JavaScript?\nThis allows the text to be styled, but it also poses security risks.",
+    stlStrSecondJsAlert = "JavaScripted subtitle was once loaded.\nTo use another JavaScripted subtitle properly, refresh the page.";
 
 var userLang = navigator.language || navigator.userLanguage;
 if (userLang.includes("ko")) {
@@ -54,7 +55,8 @@ if (userLang.includes("ko")) {
         stlStrInvalidSubtFormat = "올바르지 않은 자막 형식",
         stlStrCancel = "취소",
         stlStrCanceled = "취소됨",
-        stlStrConfirmJs = "이 자막이 자바스크립트를 실행하도록 허용하시겠습니까?\n이는 텍스트에 스타일을 적용할 수 있게 하지만, 보안 문제를 야기할 수 있습니다.";
+        stlStrConfirmJs = "이 자막이 자바스크립트를 실행하도록 허용하시겠습니까?\n이는 텍스트에 스타일을 적용할 수 있게 해주지만, 보안 문제를 야기할 수 있습니다.",
+        stlStrSecondJsAlert = "자바스크립트 사용 자막이 한번 로드되었습니다.\n다른 자바스크립트 사용 자막을 문제 없이 사용하려면, 페이지를 새로고침 하십시오.";
 }
 
 var videoSubtitle = document.createElement("track");
@@ -65,6 +67,7 @@ var stlMessage = document.createElement("p"), stlMessageTimer;
 var video = document.getElementsByTagName("video")[0];
 var stlDbSelect = document.createElement("select");
 var stlDbSelectPrevSelect = 0;
+var stlRanJsSubtOnce = false;
 
 stlInitUi();
 console.log("YTSubtitleLoader: Initialization complete");
@@ -124,9 +127,13 @@ function stlInitUi() {
             if (reader.result.includes("WEBVTT")) {
                 stlShowSubtitle("data:text/vtt," + encodeURI(reader.result.split("YTSLJS")[0]), true);
                 if (typeof reader.result.split("YTSLJS")[1] !== 'undefined') {
+                    if (stlRanJsSubtOnce) alert(stlStrSecondJsAlert);
                     if (confirm(stlStrConfirmJs)) {
                         eval(reader.result.split("YTSLJS")[1]);
+                        stlRanJsSubtOnce = true;
                     }
+                } else {
+                    setVideoSubtitleStyle("");
                 }
             } else {
                 stlShowMessage(stlStrInvalidSubtFormat);
@@ -338,9 +345,13 @@ function stlLoadSubtitleFromUrl(url, unselectDbSelect) {
             if (xhr.response.includes("WEBVTT")) {
                 stlShowSubtitle("data:text/vtt," + encodeURI(xhr.response.split("YTSLJS")[0]), unselectDbSelect)
                 if (typeof xhr.response.split("YTSLJS")[1] !== 'undefined') {
+                    if (stlRanJsSubtOnce) alert(stlStrSecondJsAlert);
                     if (confirm(stlStrConfirmJs)) {
                         eval(xhr.response.split("YTSLJS")[1]);
+                        stlRanJsSubtOnce = true;
                     }
+                } else {
+                    setVideoSubtitleStyle("");
                 }
             } else {
                 stlShowMessage(stlStrInvalidSubtFormat);
