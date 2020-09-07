@@ -193,7 +193,7 @@ function stlInitUi() {
     stlDbSelect.disabled = true;
     stlDbSelect.onchange = function () {
         if (stlDbSelect.selectedIndex + 1 == stlDbSelect.length) {
-            window.open("https://ytsubtitleloader.tk/db", "_blank");
+            window.open("https://ytsubtitleloader.tk/db?video=" + parseVideoId(), "_blank");
             stlDbSelect.selectedIndex = stlDbSelectPrevSelect;
         } else {
             stlLoadSubtitleFromDb();
