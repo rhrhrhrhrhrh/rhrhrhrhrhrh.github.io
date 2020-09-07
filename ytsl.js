@@ -1,6 +1,6 @@
 // Define strings
 var stlServerUrl = "https://ytsubtitleloader.tk",
-    stlStrUnsupported = "Run this script in a YouTube video page. (desktop / mobile - iframe, embed, etc are not supported)",
+    stlStrUnsupported = "Run this script in YouTube video page. (desktop / mobile - iframe, embed, etc are not supported)",
     stlStrSelectVttFile = "Select a file",
     stlStrSubtitleLoaded = "Subtitle loaded",
     stlStrEnterSubtAddr = "Enter URL",
