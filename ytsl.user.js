@@ -3,6 +3,7 @@
 // @connect     https://ytsubtitleloader.tk/
 // @description Load custom subtitles / closed captions to YouTube
 // @version     1.0
+// @downloadURL https://2.ytsubtitleloader.tk/ytsl.user.js
 // @include     *://*.youtube.com/*
 // @author      YTSubtitleLoader
 // @connect     ytsubtitleloader.tk
