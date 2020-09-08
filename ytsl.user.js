@@ -1,5 +1,6 @@
 // ==UserScript==
 // @name        YTSubtitleLoader
+// @namespace   https://ytsubtitleloader.tk/
 // @connect     https://ytsubtitleloader.tk/
 // @description Load custom subtitles / closed captions to YouTube
 // @version     1.0
