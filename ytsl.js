@@ -26,7 +26,8 @@ var stlServerUrl = "https://ytsubtitleloader.tk",
     stlStrCancel = "Cancel",
     stlStrCanceled = "Canceled",
     stlStrConfirmJs = "Do you want this subtitle to run JavaScript?\nThis allows the text to be styled, but it also poses security risks.",
-    stlStrSecondJsAlert = "JavaScripted subtitle was once loaded.\nTo use another JavaScripted subtitle properly, refresh the page.";
+    stlStrSecondJsAlert = "JavaScripted subtitle was once loaded.\nTo use another JavaScripted subtitle properly, refresh the page.",
+    stlStrNotice = "Userscript version of YTSubtitleLoader which automatically loads to YouTube was released. Click OK to learn more.";
 
 var userLang = navigator.language || navigator.userLanguage;
 if (userLang.includes("ko")) {
@@ -56,7 +57,8 @@ if (userLang.includes("ko")) {
         stlStrCancel = "취소",
         stlStrCanceled = "취소됨",
         stlStrConfirmJs = "이 자막이 자바스크립트를 실행하도록 허용하시겠습니까?\n이는 텍스트에 스타일을 적용할 수 있게 해주지만, 보안 문제를 야기할 수 있습니다.",
-        stlStrSecondJsAlert = "자바스크립트 사용 자막이 한번 로드되었습니다.\n다른 자바스크립트 사용 자막을 문제 없이 사용하려면, 페이지를 새로고침 하십시오.";
+        stlStrSecondJsAlert = "자바스크립트 사용 자막이 한번 로드되었습니다.\n다른 자바스크립트 사용 자막을 문제 없이 사용하려면, 페이지를 새로고침 하십시오.",
+        stlStrNotice = "유튜브에 자동으로 로드되는 YTSubtitleLoader의 유저스크립트 버전이 출시되었습니다. 자세히 알아보려면 확인 버튼을 누르세요.";
 }
 
 var videoSubtitle = document.createElement("track");
@@ -238,6 +240,18 @@ function stlInitUi() {
         stlDbSelectPrevSelect = stlDbSelect.selectedIndex;
     };
     stlContainer.appendChild(stlUnloadBtn);
+    
+    var stlNotice = document.createElement("button");
+    stlNotice.className = "stlButton stlLabel stlLabelEngOnly";
+    stlNotice.style = "color: white; background: blue !important; border-radius: 50%; width: 20px; height: 20px;";
+    stlNotice.textContent = "!";
+    stlNotice.onclick = function () {
+        if (confirm(stlStrNotice)) {
+            window.open(stlServerUrl);
+        }
+        stlNotice.remove();
+    };
+    stlContainer.appendChild(stlNotice);
 
     stlMessage.className = "stlLabel";
     stlContainer.appendChild(stlMessage);
