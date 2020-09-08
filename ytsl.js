@@ -70,9 +70,10 @@ var stlDbSelectPrevSelect = 0;
 var stlRanJsSubtOnce = false;
 var videoSubtitleStyle = document.createElement("style");
 videoSubtitleStyle.innerHTML = "::cue {  }";
+var stlLoop;
+var prevUrl = location.href;
 
 stlInitUi();
-console.log("YTSubtitleLoader: Initialization complete");
 
 function stlInitUi() {
     var playerContainer = document.getElementsByClassName("ytd-player")[0];
@@ -81,13 +82,11 @@ function stlInitUi() {
         playerContainer = document.getElementsByTagName("ytm-app")[0];
         playerType = "mobile";
         if (!playerContainer) {
-            playerContainer = document.getElementsByTagName("iframe")[0];
-            playerType = "iframe";
-            if (!playerContainer) {
-                playerContainer = document.getElementsByTagName("embed")[0];
-                playerType = "embed";
-            };
-            alert(stlStrUnsupported);
+            if (window.location.href.includes("youtube.com")) {
+                stlLoop = setInterval(stlWaitForVideoPage, 500);
+            } else {
+                alert(stlStrUnsupported);
+            }
             return;
         };
     };
@@ -245,6 +244,15 @@ function stlInitUi() {
 
     stlLoadDb();
 
+    stlLoop = setInterval(stlDetectUrlChange, 200);
+    if (playerType == "mobile") {
+        setInterval(function () {
+            playerContainer.appendChild(stlContainer);
+        }, 1000);
+    }
+    
+    console.log("YTSubtitleLoader: Initialization complete");
+
     function stlLoadDb() {
         var xhr = new XMLHttpRequest();
         xhr.open("GET", stlServerUrl + "/db/" + parseVideoId(), true);
@@ -327,6 +335,33 @@ function stlInitUi() {
         stlDbSelectPrevSelect = stlDbSelect.selectedIndex;
         stlDbSelectAddBtn.selected = false;
         stlLoadDb();
+    }
+
+    function stlDetectUrlChange() {
+        if (prevUrl != window.location.href) {
+            setTimeout(function () {
+                video = document.getElementsByTagName("video")[0];
+                if (!isSafari()) {
+                    try {
+                        video.textTracks[video.textTracks.length - 1].mode = "hidden";
+                        console.log("YTSubtitleLoader: video.textTracks.mode = hidden was done");
+                        videoSubtitle.remove();
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+                stlDbRefresh();
+            }, 2000)
+            prevUrl = window.location.href;
+        }
+    }
+
+    function stlWaitForVideoPage() {
+        if (document.getElementsByClassName("ytd-player")[0] || document.getElementsByTagName("ytm-app")[0]) {
+            setTimeout(stlInitUi, 6000);
+            clearInterval(stlLoop);
+            prevUrl = window.location.href;
+        }
     }
 }
 
