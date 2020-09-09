@@ -1,2 +1,124 @@
-000webhost ㅄ호스팅 터짐
-GCP로 이전 작업중임
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>YTSubtitleLoader</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-sm navbar-light bg-light">
+        <a class="navbar-brand" href="/">YTSubtitleLoader</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav w-100">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#"><?php echo $lang == "ko" ? "홈" : "Home"; ?> <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="db">DB</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:alert('Coming Soon!');"><?php echo $lang == "ko" ? "게시판" : "Forum"; ?></a>
+                </li>
+                <?php if ($admin) { ?>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="#"><?php echo $lang == "ko" ? "관리자" : "Admin"; ?></a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="/admin/backup.php">백업</a>
+                            <a class="dropdown-item" href="/admin/list.php">자막 목록</a>
+                            <a class="dropdown-item" href="/admin/submit.php">자막 업로드 / 다운로드 (관리자)</a>
+                            <a class="dropdown-item" href="/admin/logs.php">접속 로그</a>
+                            <a class="dropdown-item" href="/admin/errors.php">오류 로그</a>
+                        </div>
+                    </li>
+                <?php } ?>
+                <li class="nav-item dropdown ml-auto">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Language
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                        <?php if ($syslang == "ko") { ?>
+                            <a class="dropdown-item" href="?lang=ko">한국어</a>
+                            <a class="dropdown-item" href="?lang=en">English</a>
+                        <?php } else { ?>
+                            <a class="dropdown-item" href="?lang=en">English</a>
+                            <a class="dropdown-item" href="?lang=ko">한국어</a>
+                        <?php } ?>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/">System</a>
+                        <a class="dropdown-item" href="https://translate.google.com/translate?sl=en&tl=en&u=ytsubtitleloader.tk" target="_blank">Other</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div id="content" style="margin-left: 10px; margin-right: 10px; margin-top: 4px; margin-bottom: 4px;">
+        <div class="alert alert-primary" role="alert">
+            000webhost ㅄ호스팅 터짐
+            GCP로 서버 이전 작업중입니다.
+        </div>
+        <img src="https://2.ytsubtitleloader.tk/screenshot.png" style="display: block; width: 100%; max-width: 800px; margin: 0 auto;" alt="Screenshot">
+        <div id="install-guide" style="width: 100%; max-width: 1200px; margin: 0 auto;">
+            <h4 style="margin-top: 5px;"><?php echo $lang == "ko" ? "사용법" : "How to use"; ?></h4>
+            <ul class="nav nav-tabs" style="margin-bottom: 5px;">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#userscript">Userscript</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#bookmarklet">Bookmarklet</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#extension">Extension</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#android">Android</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#ios">iOS</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane fade" id="bookmarklet">
+                    <p><?php echo $lang == "ko" ? "이 링크를 북마크 바로 드래그한 후 유튜브 동영상 페이지에서 실행하세요" : "Drag this link to the bookmarks bar and run in YouTube video page"; ?>: <a href="javascript:(function(){var script = document.createElement('script'); script.src='https://2.ytsubtitleloader.tk/ytsl.js'; document.body.appendChild(script);})();">YTSubtitleLoader</a></p>
+                    <?php echo $lang == "ko" ? "복붙용 코드" : "Code for copy & paste"; ?>:
+                    <div style="border: thin solid black; max-width: 500px;">javascript:(function(){var script = document.createElement('script'); script.src='https://2.ytsubtitleloader.tk/ytsl.js'; document.body.appendChild(script);})();</div>
+                </div>
+                <div class="tab-pane fade" id="extension">
+                    <p>Coming Soon</p>
+                </div>
+                <div class="tab-pane fade show active" id="userscript">
+                    <?php if ($lang == "ko") { ?>
+                    <p>유저스크립트를 설치하기 위해서 <a href="https://www.tampermonkey.net/">Tampermonkey</a> 또는 <a href="https://www.greasespot.net/">Greasemonkey</a> 확장 기능이 필요합니다.</p>
+                    <p>해당 확장 기능을 설치한 후 <a href="https://2.ytsubtitleloader.tk/ytsl.user.js">여기</a>를 눌러 YTSubtitleLoader 유저스크립트를 설치하세요.</p>
+                    <?php } else { ?>
+                    <p><a href="https://www.tampermonkey.net/">Tampermonkey</a> or <a href="https://www.greasespot.net/">Greasemonkey</a> extension is required to install the userscript.</p>
+                    <p>After installing the extension, click <a href="https://2.ytsubtitleloader.tk/ytsl.user.js">here</a> to install YTSubtitleLoader userscript.</p>
+                    <?php } ?>
+                </div>
+                <div class="tab-pane fade" id="android">
+                    <p>Coming Soon</p>
+                </div>
+                <div class="tab-pane fade" id="ios">
+                    <p>Coming Soon</p>
+                </div>
+            </div>
+            <br>
+            <p><a href="db"><?php echo $lang == "ko" ? "YTSubtitleLoader DB에 자막 업로드" : "Upload subtitle to YTSubtitleLoader DB"; ?></a></p>
+        </div>
+    </div>
+    <hr>
+    <!-- anti-spam -->
+    <p style="text-align: center;">Contact: <a href="javascript:location.href = atob('bWFpbHRvOmFkbWluQHl0c3VidGl0bGVsb2FkZXIudGs=');">admin <i>at</i> ytsubtitleloader <i>dot</i> tk</a>
+    <br>
+    <a href="/privacypolicy.php"><?php echo $lang == "ko" ? "개인정보 처리방침 (미완)" : "Privacy Policy (Incomplete)"; ?></a></p>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+</body>
+
+</html>
