@@ -25,18 +25,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="javascript:alert('Coming Soon!');"><?php echo $lang == "ko" ? "게시판" : "Forum"; ?></a>
                 </li>
-                <?php if ($admin) { ?>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="#"><?php echo $lang == "ko" ? "관리자" : "Admin"; ?></a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="/admin/backup.php">백업</a>
-                            <a class="dropdown-item" href="/admin/list.php">자막 목록</a>
-                            <a class="dropdown-item" href="/admin/submit.php">자막 업로드 / 다운로드 (관리자)</a>
-                            <a class="dropdown-item" href="/admin/logs.php">접속 로그</a>
-                            <a class="dropdown-item" href="/admin/errors.php">오류 로그</a>
-                        </div>
-                    </li>
-                <?php } ?>
+                
                 <li class="nav-item dropdown ml-auto">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Language
@@ -58,9 +47,9 @@
         </div>
     </nav>
     <div id="content" style="margin-left: 10px; margin-right: 10px; margin-top: 4px; margin-bottom: 4px;">
-        <div class="alert alert-primary" role="alert">
-            000webhost ㅄ호스팅 터짐
-            GCP로 서버 이전 작업중입니다.
+        <div class="alert alert-danger" role="alert">
+            <p>000webhost ㅄ호스팅 터짐<br>
+                GCP로 서버 이전 작업중입니다.</p>
         </div>
         <img src="https://2.ytsubtitleloader.tk/screenshot.png" style="display: block; width: 100%; max-width: 800px; margin: 0 auto;" alt="Screenshot">
         <div id="install-guide" style="width: 100%; max-width: 1200px; margin: 0 auto;">
