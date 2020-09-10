@@ -1,10 +1,13 @@
+// Changes: Added proper update management
+// 변경사항: 적절한 업데이트 관리 추가
+//
 // ==UserScript==
 // @name        YTSubtitleLoader
 // @namespace   https://ytsubtitleloader.tk/
-// @connect     https://ytsubtitleloader.tk/
 // @description Load custom subtitles / closed captions to YouTube
-// @version     1.0
+// @version     1.1
 // @downloadURL https://2.ytsubtitleloader.tk/ytsl.user.js
+// @updateURL   https://2.ytsubtitleloader.tk/ytsl.user.js
 // @include     *://*.youtube.com/*
 // @author      YTSubtitleLoader
 // @connect     ytsubtitleloader.tk
@@ -266,7 +269,7 @@ function stlInitUi() {
 
     function stlLoadDb() {
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", stlServerUrl + "/db/" + parseVideoId(), true);
+        xhr.open("GET", stlServerUrl + "/db/" + parseVideoId() + "&t=u1.1", true);
         //xhr.timeout = 25000;
         xhr.send();
         stlDbRefreshBtn.textContent = stlStrCancel;
