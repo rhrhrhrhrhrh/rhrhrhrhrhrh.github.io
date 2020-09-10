@@ -175,6 +175,7 @@ function stlInitUi() {
     stlAutoLoadDbChkBox.type = "checkbox";
     stlAutoLoadDbChkBox.id = "stlAutoLoadDbChkBox";
     stlAutoLoadDbChkBox.onchange = function () {
+        stlAutoLoadDb = this.checked;
         localStorage.setItem("stlDisableAutoLoadDb", !this.checked);
     };
     stlAutoLoadDbChkBox.checked = stlAutoLoadDb;
