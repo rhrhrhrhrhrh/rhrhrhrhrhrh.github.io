@@ -27,7 +27,12 @@ var stlServerUrl = "https://ytsubtitleloader.tk",
     stlStrCanceled = "Canceled",
     stlStrConfirmJs = "Do you want this subtitle to run JavaScript?\nThis allows the text to be styled, but it also poses security risks.",
     stlStrSecondJsAlert = "JavaScripted subtitle was once loaded.\nTo use another JavaScripted subtitle properly, refresh the page.",
-    stlStrNotice = "Userscript version of YTSubtitleLoader which automatically loads to YouTube was released. Click OK to learn more.";
+    stlStrNotice = "Userscript version of YTSubtitleLoader which automatically loads to YouTube was released. Click OK to learn more.",
+    stlStrMenu = "Menu",
+    stlStrMenu = "Menu",
+    stlStrAutoLoadDb = "Auto load DB",
+    stlStrClearSettings = "Clear YTSL settings",
+    stlStrClose = "Close";
 
 var userLang = navigator.language || navigator.userLanguage;
 if (userLang.includes("ko")) {
@@ -58,7 +63,11 @@ if (userLang.includes("ko")) {
         stlStrCanceled = "취소됨",
         stlStrConfirmJs = "이 자막이 자바스크립트를 실행하도록 허용하시겠습니까?\n이는 텍스트에 스타일을 적용할 수 있게 해주지만, 보안 문제를 야기할 수 있습니다.",
         stlStrSecondJsAlert = "자바스크립트 사용 자막이 한번 로드되었습니다.\n다른 자바스크립트 사용 자막을 문제 없이 사용하려면, 페이지를 새로고침 하십시오.",
-        stlStrNotice = "유튜브에 자동으로 로드되는 YTSubtitleLoader의 유저스크립트 버전이 출시되었습니다. 자세히 알아보려면 확인 버튼을 누르세요.";
+        stlStrNotice = "유튜브에 자동으로 로드되는 YTSubtitleLoader의 유저스크립트 버전이 출시되었습니다. 자세히 알아보려면 확인 버튼을 누르세요.",
+        stlStrMenu = "메뉴",
+        stlStrAutoLoadDb = "DB 자동 로드",
+        stlStrClearSettings = "YTSL 설정값 초기화",
+        stlStrClose = "닫기";
 }
 
 var videoSubtitle = document.createElement("track");
@@ -94,9 +103,10 @@ function stlInitUi() {
     };
 
     var stlDbSubtitles;
+    var stlAutoLoadDb = localStorage.stlDisableAutoLoadDb != "true";
 
     var stlStyle = document.createElement("style");
-    stlStyle.innerHTML = '.stlLabel { float: left; font-size: 16px; margin-left: 2px; margin-right: 2px; } .stlLink { color: black !important; text-decoration: none !important; } .stlButton { background: none !important; border: none; padding: 0 !important; margin-top: 0 !important; margin-bottom: 0 !important; cursor: pointer; } ::cue { display: inline-block; white-space: pre-wrap; background: rgba(8, 8, 8, 0.75) none repeat scroll 0% 0%; font-size: 33.0222px; color: #ffffff; fill: #ffffff; font-family: "YouTube Noto", Roboto, "Arial Unicode Ms", Arial, Helvetica, Verdana, "PT Sans Caption", sans-serif; }';
+    stlStyle.innerHTML = '.stlLabel { float: left; font-size: 16px; margin-left: 2px; margin-right: 2px; } .stlLink { color: black !important; text-decoration: none !important; } .stlButton { background: none !important; border: none; padding: 0 !important; margin-top: 0 !important; margin-bottom: 0 !important; cursor: pointer; } ::cue { white-space: pre-wrap; background: rgba(8, 8, 8, 0.75) none repeat scroll 0% 0%; font-size: 33.0222px; color: #ffffff; fill: #ffffff; font-family: "YouTube Noto", Roboto, "Arial Unicode Ms", Arial, Helvetica, Verdana, "PT Sans Caption", sans-serif; } .stlMenuItem { width: 150px; text-align: left; }';
     if (userLang.includes("ko")) {
         stlStyle.innerHTML += ".stlLabelEngOnly { margin-top: 1px; }";
     }
@@ -111,6 +121,87 @@ function stlInitUi() {
     var stlContainer = document.createElement("div");
     stlContainer.style.display = "block";
     playerContainer.appendChild(stlContainer);
+
+    var stlMenuBackground = document.createElement("div");
+    stlMenuBackground.style = "display: none; position: fixed; height: 100vh; width: 100vw; background: rgba(0, 0, 0, 0.5);";
+    stlMenuBackground.onclick = function () {
+        this.style.display = "none";
+    }
+    document.body.appendChild(stlMenuBackground);
+
+    var stlMenu = document.createElement("div");
+    stlMenu.style = "background: #ffffff; height: 104px; width: 150px; position: absolute; top: 50%; left: 50%; margin-top: -52px; margin-left: -125px; padding: 12px;";
+    stlMenu.onclick = function (event) {
+        event.stopPropagation();
+    }
+    stlMenuBackground.appendChild(stlMenu);
+
+    var stlFontSizeInputBtn = document.createElement("button");
+    stlFontSizeInputBtn.textContent = stlStrEnterFontSize;
+    stlFontSizeInputBtn.className = "stlLabel stlButton stlMenuItem";
+    stlFontSizeInputBtn.onclick = function () {
+        var str = prompt(stlStrEnterFontSizeDialog);
+        if (str == null) return;
+        videoSubtitleStyleForFontSize.innerHTML = "::cue { font-size: " + (isNaN(str) ? str : str + "px") + "; }";
+        stlMenuBackground.style.display = "none";
+        stlShowMessage(stlStrFontSizeChanged);
+    };
+    stlMenu.appendChild(stlFontSizeInputBtn);
+
+    var stlMenuNewline = document.createElement("br");
+    stlMenu.appendChild(stlMenuNewline);
+
+    var stlAutoLoadDbLabel = document.createElement("label");
+    stlAutoLoadDbLabel.className = "stlLabel stlMenuItem";
+    stlAutoLoadDbLabel.textContent = stlStrAutoLoadDb;
+    stlAutoLoadDbLabel.htmlFor = "stlAutoLoadDbChkBox";
+    stlMenu.appendChild(stlAutoLoadDbLabel);
+
+    var stlAutoLoadDbChkBox = document.createElement("input");
+    stlAutoLoadDbChkBox.type = "checkbox";
+    stlAutoLoadDbChkBox.id = "stlAutoLoadDbChkBox";
+    stlAutoLoadDbChkBox.onchange = function () {
+        localStorage.setItem("stlDisableAutoLoadDb", !this.checked);
+    };
+    stlAutoLoadDbChkBox.checked = stlAutoLoadDb;
+    stlAutoLoadDbLabel.appendChild(stlAutoLoadDbChkBox);
+
+    var stlMenuNewline2 = stlMenuNewline.cloneNode(true);
+    stlMenu.appendChild(stlMenuNewline2);
+
+    var stlClearSettingsBtn = document.createElement("button");
+    stlClearSettingsBtn.textContent = stlStrClearSettings;
+    stlClearSettingsBtn.className = "stlLabel stlButton stlMenuItem";
+    stlClearSettingsBtn.onclick = function () {
+        localStorage.removeItem("stlNoticeIgnore");
+        localStorage.removeItem("stlDisableAutoLoadDb");
+        stlMenuBackground.style.display = "none";
+        alert("OK");
+    };
+    stlMenu.appendChild(stlClearSettingsBtn);
+
+    var stlMenuNewline3 = stlMenuNewline.cloneNode(true);
+    stlMenu.appendChild(stlMenuNewline3);
+
+    var stlGitHubBtn = document.createElement("button");
+    stlGitHubBtn.textContent = "GitHub";
+    stlGitHubBtn.className = "stlLabel stlButton stlMenuItem";
+    stlGitHubBtn.onclick = function () {
+        window.open("https://github.com/rhrhrhrhrhrh/YTSubtitleLoader");
+        stlMenuBackground.style.display = "none";
+    };
+    stlMenu.appendChild(stlGitHubBtn);
+
+    var stlMenuNewline4 = stlMenuNewline.cloneNode(true);
+    stlMenu.appendChild(stlMenuNewline4);
+
+    var stlCloseBtn = document.createElement("button");
+    stlCloseBtn.textContent = stlStrClose;
+    stlCloseBtn.className = "stlLabel stlButton stlMenuItem";
+    stlCloseBtn.onclick = function () {
+        stlMenuBackground.style.display = "none";
+    };
+    stlMenu.appendChild(stlCloseBtn);
 
     var stlLabel = document.createElement("p");
     stlLabel.className = "stlLabel";
@@ -174,20 +265,9 @@ function stlInitUi() {
     var stlSeparator2 = stlSeparator.cloneNode(true);
     stlContainer.appendChild(stlSeparator2);
 
-    var stlFontSizeInputBtn = document.createElement("button");
-    stlFontSizeInputBtn.textContent = stlStrEnterFontSize;
-    stlFontSizeInputBtn.className = "stlLabel stlButton";
-    stlFontSizeInputBtn.onclick = function () {
-        var str = prompt(stlStrEnterFontSizeDialog);
-        if (str == null) return;
-        videoSubtitleStyleForFontSize.innerHTML = "::cue { font-size: " + (isNaN(str) ? str : str + "px") + "; }";
-        stlShowMessage(stlStrFontSizeChanged);
-    };
-    stlContainer.appendChild(stlFontSizeInputBtn);
-
     var stlDbLabel = document.createElement("p");
     stlDbLabel.className = "stlLabel stlLabelEngOnly";
-    stlDbLabel.innerHTML = "| <a href='" + stlServerUrl + "/db' class='stlLink' target='_blank'>YTSL DB</a>:";
+    stlDbLabel.innerHTML = "<a href='" + stlServerUrl + "/db' class='stlLink' target='_blank'>YTSL DB</a>:";
     stlContainer.appendChild(stlDbLabel);
 
     stlDbSelect.style.float = "left";
@@ -241,6 +321,17 @@ function stlInitUi() {
     };
     stlContainer.appendChild(stlUnloadBtn);
     
+    var stlSeparator4 = stlSeparator.cloneNode(true);
+    stlContainer.appendChild(stlSeparator4);
+
+    var stlMenuBtn = document.createElement("button");
+    stlMenuBtn.textContent = stlStrMenu;
+    stlMenuBtn.className = "stlLabel stlButton";
+    stlMenuBtn.onclick = function () {
+        stlMenuBackground.style.display = "block";
+    };
+    stlContainer.appendChild(stlMenuBtn);
+    
     var stlNotice = document.createElement("button");
     stlNotice.className = "stlButton stlLabel stlLabelEngOnly";
     stlNotice.style = "color: white; background: blue !important; border-radius: 50%; width: 20px; height: 20px;";
@@ -248,15 +339,22 @@ function stlInitUi() {
     stlNotice.onclick = function () {
         if (confirm(stlStrNotice)) {
             window.open(stlServerUrl);
+        } else {
+            localStorage.setItem("stlNoticeIgnore", "1");
         }
         stlNotice.remove();
     };
-    stlContainer.appendChild(stlNotice);
+    if (!(parseInt(localStorage.stlNoticeIgnore, 10) >= 1)) stlContainer.appendChild(stlNotice);
 
     stlMessage.className = "stlLabel";
     stlContainer.appendChild(stlMessage);
 
-    stlLoadDb();
+    if (stlAutoLoadDb) {
+        stlLoadDb();
+    } else {
+        stlDbSelectPlaceholder.text = stlStrNotSelected;
+        stlDbRefreshBtn.textContent = stlStrLoad;
+    }
 
     stlLoop = setInterval(stlDetectUrlChange, 200);
     if (playerType == "mobile") {
@@ -269,7 +367,7 @@ function stlInitUi() {
 
     function stlLoadDb() {
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", stlServerUrl + "/db/" + parseVideoId(), true);
+        xhr.open("GET", stlServerUrl + "/db/" + parseVideoId() + "&t=b", true);
         //xhr.timeout = 25000;
         xhr.send();
         stlDbRefreshBtn.textContent = stlStrCancel;
@@ -364,8 +462,19 @@ function stlInitUi() {
                         console.log(e);
                     }
                 }
-                stlDbRefresh();
-            }, 2000)
+                if (stlAutoLoadDb) {
+                    stlDbRefresh();
+                } else {
+                    stlDbSelect.innerHTML = "";
+                    stlDbSelectPlaceholder.text = stlStrNotSelected;
+                    stlDbSelect.disabled = true;
+                    stlDbSelect.appendChild(stlDbSelectPlaceholder);
+                    stlDbSelect.selectedIndex = 0;
+                    stlDbSelectPrevSelect = stlDbSelect.selectedIndex;
+                    stlDbSelectAddBtn.selected = false;
+                    stlDbRefreshBtn.textContent = stlStrLoad;
+                }
+            }, 2000);
             prevUrl = window.location.href;
         }
     }
