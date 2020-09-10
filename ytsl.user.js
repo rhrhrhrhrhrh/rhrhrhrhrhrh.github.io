@@ -381,7 +381,7 @@ function stlInitUi() {
 
     function stlLoadDb() {
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", stlServerUrl + "/db/" + parseVideoId() + "&t=b", true);
+        xhr.open("GET", stlServerUrl + "/db/" + parseVideoId() + "&t=u1.2", true);
         //xhr.timeout = 25000;
         xhr.send();
         stlDbRefreshBtn.textContent = stlStrCancel;
