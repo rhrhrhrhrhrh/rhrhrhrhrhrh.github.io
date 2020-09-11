@@ -24,6 +24,8 @@ Module.expectedDataFileDownloads++;
    err("warning: you defined Module.locateFilePackage, that has been renamed to Module.locateFile (using your locateFilePackage for now)");
   }
   var REMOTE_PACKAGE_NAME = Module["locateFile"] ? Module["locateFile"](REMOTE_PACKAGE_BASE, "") : REMOTE_PACKAGE_BASE;
+  console.log(REMOTE_PACKAGE_NAME);
+  return;
   var REMOTE_PACKAGE_SIZE = metadata["remote_package_size"];
   var PACKAGE_UUID = metadata["package_uuid"];
   function fetchRemotePackage(packageName, packageSize, callback, errback) {
