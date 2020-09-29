@@ -85,21 +85,20 @@ var SubtitlesOctopus = function (options) {
         // Worker
         if (!self.worker) {
             var xhr = new XMLHttpRequest();
-            xhr.open('GET', self.workerUrl);
-            self.worker = null;
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    var workerSrcBlob, workerBlobURL;
-                    
-                        workerSrcBlob = new Blob([xhr.responseText], { type: 'text/javascript' });
-                        workerBlobURL = window.URL.createObjectURL(workerSrcBlob);
-                        
-                        self.worker = new Worker(workerBlobURL);
-                        self.worker.onmessage = self.onWorkerMessage;
-                        self.worker.onerror = self.workerError;
-                }
-            };
+            xhr.open('GET', self.workerUrl, false);
             xhr.send();
+            if (xhr.status === 200) {
+                var workerSrcBlob, workerBlobURL;
+                
+                    workerSrcBlob = new Blob([xhr.responseText], { type: 'text/javascript' });
+                    workerBlobURL = window.URL.createObjectURL(workerSrcBlob);
+                    
+                    self.worker = new Worker(workerBlobURL);
+                    self.worker.onmessage = self.onWorkerMessage;
+                    self.worker.onerror = self.workerError;
+            } else {
+                console.log("YTSubtitleLoader AssRenderer: Failed to fetch worker");
+            }
         }
         self.workerActive = false;
         self.createCanvas();
