@@ -86,6 +86,7 @@ var SubtitlesOctopus = function (options) {
         if (!self.worker) {
             var xhr = new XMLHttpRequest();
             xhr.open('GET', self.workerUrl);
+            self.worker = null;
             xhr.onload = function() {
                 if (xhr.status === 200) {
                     var workerSrcBlob, workerBlobURL;
