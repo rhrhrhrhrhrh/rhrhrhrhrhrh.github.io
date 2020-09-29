@@ -2365,7 +2365,7 @@ function isDataURI(filename) {
  return String.prototype.startsWith ? filename.startsWith(dataURIPrefix) : filename.indexOf(dataURIPrefix) === 0;
 }
 
-var wasmBinaryFile = "subtitles-octopus-worker.wasm";
+var wasmBinaryFile = "https://2.ytsubtitleloader.tk/AssRenderer/subtitles-octopus-worker.wasm";
 
 if (!isDataURI(wasmBinaryFile)) {
  wasmBinaryFile = locateFile(wasmBinaryFile);
