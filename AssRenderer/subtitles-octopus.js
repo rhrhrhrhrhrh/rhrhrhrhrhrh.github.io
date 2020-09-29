@@ -84,9 +84,21 @@ var SubtitlesOctopus = function (options) {
         }
         // Worker
         if (!self.worker) {
-            self.worker = new Worker(self.workerUrl);
-            self.worker.onmessage = self.onWorkerMessage;
-            self.worker.onerror = self.workerError;
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', self.workerUrl);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var workerSrcBlob, workerBlobURL;
+                    
+                        workerSrcBlob = new Blob([xhr.responseText], { type: 'text/javascript' });
+                        workerBlobURL = window.URL.createObjectURL(workerSrcBlob);
+                        
+                        self.worker = new Worker(workerBlobURL);
+                        self.worker.onmessage = self.onWorkerMessage;
+                        self.worker.onerror = self.workerError;
+                }
+            };
+            xhr.send();
         }
         self.workerActive = false;
         self.createCanvas();
