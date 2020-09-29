@@ -18,7 +18,7 @@ Module.expectedDataFileDownloads++;
    throw "using preloaded data can only be done on a web page or in a web worker";
   }
   var PACKAGE_NAME = "dist/js/subtitles-octopus-worker.data";
-  var REMOTE_PACKAGE_BASE = "subtitles-octopus-worker.data";
+  var REMOTE_PACKAGE_BASE = "https://2.ytsubtitleloader.tk/AssRenderer/subtitles-octopus-worker.data";
   if (typeof Module["locateFilePackage"] === "function" && !Module["locateFile"]) {
    Module["locateFile"] = Module["locateFilePackage"];
    err("warning: you defined Module.locateFilePackage, that has been renamed to Module.locateFile (using your locateFilePackage for now)");
