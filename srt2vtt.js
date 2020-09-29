@@ -86,5 +86,3 @@ class WebVTTConverter {
 }
 
 window.WebVTTConverter = WebVTTConverter;
-
-export default WebVTTConverter;
