@@ -1,11 +1,8 @@
-// Changes: Added ASS support, UI improvements, Solved not showing up on video load when initialized in non-video page
-// 변경사항: ASS 지원 추가, UI 개선, 비 동영상 페이지에서 시작되었을 때 동영상 로드 후 나타나지 않는 문제 해결
-//
 // ==UserScript==
 // @name        YTSubtitleLoader
 // @namespace   https://ytsubtitleloader.tk/
 // @description Load custom subtitles / closed captions to YouTube
-// @version     1.3
+// @version     1.4
 // @downloadURL https://2.ytsubtitleloader.tk/ytsl.user.js
 // @updateURL   https://2.ytsubtitleloader.tk/ytsl.user.js
 // @include     *://*.youtube.com/*
@@ -55,7 +52,9 @@ var stlServerUrl = "https://ytsubtitleloader.tk",
     stlStrClose = "Close",
     stlStrAssLoadFail = "Failed to load ASS renderer",
     stlStrFontSizeUnchangeable = "This feature is currently unavailable for ASS subtitles.",
-    stlStrSrtConvFail = "Failed to load SRT converter";
+    stlStrSrtConvFail = "Failed to load SRT converter",
+    stlStrPrivPolicy = "Privacy Policy",
+    stlStrOpenSrcLicense = "Open Source License";
 
 var userLang = navigator.language || navigator.userLanguage;
 if (userLang.includes("ko")) {
@@ -93,7 +92,9 @@ if (userLang.includes("ko")) {
         stlStrClose = "닫기",
         stlStrAssLoadFail = "ASS 렌더러 로딩 실패",
         stlStrFontSizeUnchangeable = "현재 ASS 자막에서는 사용할 수 없는 기능입니다.",
-        stlStrSrtConvFail = "SRT 컨버터 로딩 실패";
+        stlStrSrtConvFail = "SRT 컨버터 로딩 실패",
+        stlStrPrivPolicy = "개인정보 처리방침",
+        stlStrOpenSrcLicense = "오픈소스 라이선스";
 }
 
 var videoSubtitle = document.createElement("track");
@@ -156,7 +157,7 @@ function stlInitUi() {
     document.body.appendChild(stlMenuBackground);
 
     var stlMenu = document.createElement("div");
-    stlMenu.style = "background: #ffffff; height: 104px; width: 150px; position: absolute; top: 50%; left: 50%; margin-top: -52px; margin-left: -125px; padding: 12px;";
+    stlMenu.style = "background: #ffffff; height: 140px; width: 150px; position: absolute; top: 50%; left: 50%; margin-top: -70px; margin-left: -75px; padding: 12px;";
     stlMenu.onclick = function (event) {
         event.stopPropagation();
     }
@@ -166,7 +167,7 @@ function stlInitUi() {
     stlFontSizeInputBtn.textContent = stlStrEnterFontSize;
     stlFontSizeInputBtn.className = "stlLabel stlButton stlMenuItem";
     stlFontSizeInputBtn.onclick = function () {
-        if (stlAssInstance) {
+        if (stlAssLoaded) {
             alert(stlStrFontSizeUnchangeable);
             return;
         }
@@ -191,6 +192,7 @@ function stlInitUi() {
     var stlAutoLoadDbChkBox = document.createElement("input");
     stlAutoLoadDbChkBox.type = "checkbox";
     stlAutoLoadDbChkBox.id = "stlAutoLoadDbChkBox";
+    stlAutoLoadDbChkBox.style.cursor = "pointer";
     stlAutoLoadDbChkBox.onchange = function () {
         stlAutoLoadDb = this.checked;
         localStorage.setItem("stlDisableAutoLoadDb", !this.checked);
@@ -228,10 +230,28 @@ function stlInitUi() {
     stlMenu.appendChild(stlMenuNewline4);
     
     var stlInfoText = document.createElement("p");
-    stlInfoText.textContent = "YTSubtitleLoader 1.3 (U)";
+    stlInfoText.textContent = "YTSubtitleLoader 1.4 (U)";
     stlInfoText.className = "stlLabel stlMenuItem";
     stlInfoText.style = "color: gray; font-size: 12px;";
     stlMenu.appendChild(stlInfoText);
+
+    var stlPrivPolBtn = document.createElement("button");
+    stlPrivPolBtn.textContent = stlStrPrivPolicy;
+    stlPrivPolBtn.className = "stlLabel stlButton stlMenuItem";
+    stlPrivPolBtn.onclick = function () {
+        window.open(stlServerUrl + "/privacypolicy.php");
+        stlMenuBackground.style.display = "none";
+    };
+    stlMenu.appendChild(stlPrivPolBtn);
+
+    var stlOpenSrcBtn = document.createElement("button");
+    stlOpenSrcBtn.textContent = stlStrOpenSrcLicense;
+    stlOpenSrcBtn.className = "stlLabel stlButton stlMenuItem";
+    stlOpenSrcBtn.onclick = function () {
+        window.open(stlServerUrl + "/opensource.php");
+        stlMenuBackground.style.display = "none";
+    };
+    stlMenu.appendChild(stlOpenSrcBtn);
 
     var stlCloseBtn = document.createElement("button");
     stlCloseBtn.textContent = stlStrClose;
@@ -413,7 +433,7 @@ function stlInitUi() {
 
     function stlLoadDb() {
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", stlServerUrl + "/db/" + parseVideoId() + "&t=u1.3", true);
+        xhr.open("GET", stlServerUrl + "/db/" + parseVideoId() + "&t=u1.4", true);
         //xhr.timeout = 25000;
         xhr.send();
         stlDbRefreshBtn.textContent = stlStrCancel;
