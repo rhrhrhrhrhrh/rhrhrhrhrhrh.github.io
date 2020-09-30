@@ -3,7 +3,7 @@
 //
 // ==UserScript==
 // @name        YTSubtitleLoader
-// @namespace   https://ytsubtitleloader.tk/dev
+// @namespace   https://ytsubtitleloader.tk/
 // @description Load custom subtitles / closed captions to YouTube
 // @version     1.3
 // @downloadURL https://home.ingan121.tk/ytsl.user.js
