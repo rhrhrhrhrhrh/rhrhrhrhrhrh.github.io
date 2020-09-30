@@ -6,8 +6,8 @@
 // @namespace   https://ytsubtitleloader.tk/
 // @description Load custom subtitles / closed captions to YouTube
 // @version     1.3
-// @downloadURL https://home.ingan121.tk/ytsl.user.js
-// @updateURL   https://home.ingan121.tk/ytsl.user.js
+// @downloadURL https://2.ytsubtitleloader.tk/ytsl.user.js
+// @updateURL   https://2.ytsubtitleloader.tk/ytsl.user.js
 // @include     *://*.youtube.com/*
 // @author      YTSubtitleLoader
 // @connect     ytsubtitleloader.tk
