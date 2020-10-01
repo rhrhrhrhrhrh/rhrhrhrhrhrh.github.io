@@ -2,7 +2,7 @@
 // @name        YTSubtitleLoader
 // @namespace   https://ytsubtitleloader.tk/
 // @description Load custom subtitles / closed captions to YouTube
-// @version     1.4
+// @version     1.5
 // @downloadURL https://2.ytsubtitleloader.tk/ytsl.user.js
 // @updateURL   https://2.ytsubtitleloader.tk/ytsl.user.js
 // @include     *://*.youtube.com/*
@@ -118,6 +118,12 @@ var workerUrl, legacyWorkerUrl, stlAssInstance;
 stlInitUi();
 
 function stlInitUi() {
+    if (parseVideoId() === null) {
+        stlLoop = setInterval(stlWaitForVideoPage, 500);
+        console.log("YTSubtitleLoader: Video page not found... waiting for video page")
+        return;
+    }
+
     var playerContainer = document.getElementsByClassName("ytd-player")[0];
     var playerType = "desktop";
     if (!playerContainer) {
@@ -125,6 +131,7 @@ function stlInitUi() {
         playerType = "mobile";
         if (!playerContainer) {
             stlLoop = setInterval(stlWaitForVideoPage, 500);
+            console.log("YTSubtitleLoader: Video not found... waiting for video page")
             return;
         };
     };
@@ -230,7 +237,7 @@ function stlInitUi() {
     stlMenu.appendChild(stlMenuNewline4);
     
     var stlInfoText = document.createElement("p");
-    stlInfoText.textContent = "YTSubtitleLoader 1.4 (U)";
+    stlInfoText.textContent = "YTSubtitleLoader 1.5 (U)";
     stlInfoText.className = "stlLabel stlMenuItem";
     stlInfoText.style = "color: gray; font-size: 12px;";
     stlMenu.appendChild(stlInfoText);
@@ -433,7 +440,7 @@ function stlInitUi() {
 
     function stlLoadDb() {
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", stlServerUrl + "/db/" + parseVideoId() + "&t=u1.4", true);
+        xhr.open("GET", stlServerUrl + "/db/" + parseVideoId() + "&t=u1.5", true);
         //xhr.timeout = 25000;
         xhr.send();
         stlDbRefreshBtn.textContent = stlStrCancel;
@@ -478,12 +485,16 @@ function stlInitUi() {
     };
 
     function parseVideoId() {
-        var video_id = window.location.search.split('v=')[1];
-        var ampersandPosition = video_id.indexOf('&');
-        if (ampersandPosition != -1) {
-            video_id = video_id.substring(0, ampersandPosition);
+        try {
+            var video_id = window.location.search.split('v=')[1];
+            var ampersandPosition = video_id.indexOf('&');
+            if (ampersandPosition != -1) {
+                video_id = video_id.substring(0, ampersandPosition);
+            }
+            return video_id;
+        } catch {
+            return null;
         }
-        return video_id;
     }
 
     function stlLoadSubtitleFromDb() {
@@ -533,8 +544,8 @@ function stlInitUi() {
     }
 
     function stlWaitForVideoPage() {
-        if (document.getElementsByClassName("ytd-player")[0] || document.getElementsByTagName("ytm-app")[0]) {
-            setTimeout(stlInitUi, 12000);
+        if ((document.getElementsByClassName("ytd-player")[0] || document.getElementsByTagName("ytm-app")[0]) && parseVideoId() !== null) {
+            setTimeout(stlInitUi, 2000);
             clearInterval(stlLoop);
             prevUrl = window.location.href;
         }
