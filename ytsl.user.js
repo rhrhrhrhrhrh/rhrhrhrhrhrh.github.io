@@ -151,7 +151,7 @@ var stlVersion = 1.6, stlType = "u";
 stlInitUi();
 
 function stlInitUi() {
-    if (parseVideoId() === null) {
+    if (window.location.href.includes("youtube.com") && parseVideoId() === null) {
         stlLoop = setInterval(stlWaitForVideoPage, 500);
         console.log("YTSubtitleLoader: Video page not found... waiting for video page")
         return;
@@ -167,8 +167,12 @@ function stlInitUi() {
                 location.href = location.href + "&app=desktop&persist_app=1";
             }
         } else {
-            stlLoop = setInterval(stlWaitForVideoPage, 500);
-            console.log("YTSubtitleLoader: Video not found... waiting for video page")
+            if (window.location.href.includes("youtube.com")) {
+                stlLoop = setInterval(stlWaitForVideoPage, 500);
+                console.log("YTSubtitleLoader: Video not found... waiting for video page");
+            } else {
+                alert(stlStrUnsupported);
+            }
             return;
         };
     };
@@ -210,9 +214,9 @@ function stlInitUi() {
     stlMenuBackground.appendChild(stlMenu);
 
     var stlMenuCloseBtn = document.createElement("button");
-    stlMenuCloseBtn.textContent = "🗙";
+    stlMenuCloseBtn.textContent = "X";
     stlMenuCloseBtn.className = "stlLabel stlButton stlMenuItem";
-    stlMenuCloseBtn.style = "float: right; width: 50px !important; text-align: right;"
+    stlMenuCloseBtn.style = "float: right; width: 50px !important; text-align: right; font-weight: bold;"
     stlMenuCloseBtn.onclick = function () {
         stlMenuBackground.style.display = "none";
     };
@@ -319,9 +323,9 @@ function stlInitUi() {
     stlSubtInfoBackground.appendChild(stlSubtInfoWindow);
 
     var stlSubtInfoCloseBtn = document.createElement("button");
-    stlSubtInfoCloseBtn.textContent = "🗙";
+    stlSubtInfoCloseBtn.textContent = "X";
     stlSubtInfoCloseBtn.className = "stlLabel stlButton stlMenuItem stlSubtInfoItem";
-    stlSubtInfoCloseBtn.style = "float: right; width: 20px !important; text-align: right;"
+    stlSubtInfoCloseBtn.style = "float: right; width: 20px !important; text-align: right; font-weight: bold;"
     stlSubtInfoCloseBtn.onclick = function () {
         stlSubtInfoBackground.style.display = "none";
     };
@@ -375,9 +379,9 @@ function stlInitUi() {
     stlMessageBoxBackground.appendChild(stlMessageBox);
 
     var stlMessageBoxCloseBtn = document.createElement("button");
-    stlMessageBoxCloseBtn.textContent = "🗙";
+    stlMessageBoxCloseBtn.textContent = "X";
     stlMessageBoxCloseBtn.className = "stlLabel stlButton stlMenuItem";
-    stlMessageBoxCloseBtn.style = "float: right; width: 20px !important; text-align: right;"
+    stlMessageBoxCloseBtn.style = "float: right; width: 20px !important; text-align: right; font-weight: bold;"
     stlMessageBoxCloseBtn.onclick = function () {
         stlMessageBoxBackground.style.display = "none";
     };
