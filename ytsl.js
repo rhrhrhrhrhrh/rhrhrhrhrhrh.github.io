@@ -1,7 +1,6 @@
 // Define strings
 var stlServerUrl = "https://ytsubtitleloader.tk",
     stlAssRendererUrl = "https://2.ytsubtitleloader.tk/AssRenderer/",
-    stlSrtConverterUrl = "",
     stlStrUnsupported = "Run this script in YouTube video page. (desktop / mobile - iframe, embed, etc are not supported)",
     stlStrSelectVttFile = "Select a file",
     stlStrSubtitleLoaded = "Subtitle loaded",
@@ -129,7 +128,6 @@ var stlAssRendererLoaded = false;
 var stlAssLoaded = false;
 var stlSrtLoaded = false;
 var workerUrl, legacyWorkerUrl, stlAssInstance;
-var stlSrtConverterLoaded = false;
 var stlSubtFormat;
 
 var stlVersion = 1.7, stlType = "b";
@@ -782,7 +780,7 @@ function stlLoadSubtitleFromUrl(url, unselectDbSelect) {
             } else if (xhr.response.includes("[Script Info]")) {
                 stlLoadAssSubtitle("data:text/plain," + encodeURI(xhr.response), unselectDbSelect);
             } else if (xhr.response.includes("-->")) {
-                stlShowSubtitle("data:text/srt," + encodeURI(srt2webvtt(xhr.response)), true);
+                stlShowSubtitle("data:text/srt," + encodeURI(srt2webvtt(xhr.response)), unselectDbSelect);
                 setVideoSubtitleStyle("");
             } else {
                 stlShowMessage(stlStrInvalidSubtFormat);
