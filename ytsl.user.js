@@ -2,7 +2,7 @@
 // @name        YTSubtitleLoader
 // @namespace   https://ytsubtitleloader.tk/
 // @description Load custom subtitles / closed captions to YouTube
-// @version     1.6
+// @version     1.7
 // @downloadURL https://2.ytsubtitleloader.tk/ytsl.user.js
 // @updateURL   https://2.ytsubtitleloader.tk/ytsl.user.js
 // @include     *://*.youtube.com/*
@@ -142,11 +142,12 @@ var prevUrl = location.href;
 var stlVttLoaded = false;
 var stlAssRendererLoaded = false;
 var stlAssLoaded = false;
+var stlSrtLoaded = false;
 var workerUrl, legacyWorkerUrl, stlAssInstance;
 var stlSrtConverterLoaded = false;
 var stlSubtFormat;
 
-var stlVersion = 1.6, stlType = "u";
+var stlVersion = 1.7, stlType = "u";
 
 stlInitUi();
 
@@ -409,14 +410,13 @@ function stlInitUi() {
     var stlFileInput = document.createElement("input");
     stlFileInput.id = "stlFileInput";
     stlFileInput.type = "file";
-    stlFileInput.accept = ".vtt,.ass,.ssa";
+    stlFileInput.accept = ".vtt,.ass,.ssa,.srt";
     stlFileInput.style.display = "none";
     stlFileInput.onchange = function () {
         var reader = new FileReader();
         reader.onload = function () {
-            var url = "data:text/vtt," + encodeURI(reader.result.split("YTSLJS")[0]);
             if (reader.result.includes("WEBVTT")) {
-                stlShowSubtitle(url, true);
+                stlShowSubtitle("data:text/vtt," + encodeURI(reader.result.split("YTSLJS")[0]), true);
                 if (typeof reader.result.split("YTSLJS")[1] !== 'undefined') {
                     if (stlRanJsSubtOnce) alert(stlStrSecondJsAlert);
                     if (confirm(stlStrConfirmJs)) {
@@ -430,6 +430,9 @@ function stlInitUi() {
             } else if (reader.result.includes("[Script Info]")) {
                 stlLoadAssSubtitle("data:text/plain," + encodeURI(reader.result), true);
                 stlSubtSrcText.textContent = stlStrSubtSrc + ": " + stlStrFile;
+            } else if (reader.result.includes("-->")) {
+                stlShowSubtitle("data:text/srt," + encodeURI(srt2webvtt(reader.result)), true);
+                setVideoSubtitleStyle("");
             } else {
                 stlShowMessage(stlStrInvalidSubtFormat);
             }
@@ -519,6 +522,9 @@ function stlInitUi() {
                     break;
                 case "vtt":
                     stlSubtFormat = "WebVTT";
+                    break;
+                case "srt":
+                    stlSubtFormat = "SubRip";
             }
             stlSubtSrcText.textContent = stlStrSubtSrc + ": YTSubtitleLoader DB";
             var stlSubtAuthor = stlDbSubtitles[stlDbSelect.selectedIndex - 1].author;
@@ -529,13 +535,14 @@ function stlInitUi() {
             stlSubtAuthorCommentText.style.display = "block";
             stlSubtDownloadBtn.style.display = "block";
         } else {
-            if (stlAssLoaded) stlSubtFormat = "Advanced SubStation Alpha";
+            if (stlAssLoaded) stlSubtFormat = "(Advanced) SubStation Alpha";
             else if (stlVttLoaded) stlSubtFormat = "WebVTT";
+            else if (stlSrtLoaded) stlSubtFormat = "SubRip";
             stlSubtAuthorText.style.display = "none";
             stlSubtAuthorCommentText.style.display = "none";
             stlSubtDownloadBtn.style.display = "none";
         }
-        if ((stlAssLoaded || stlVttLoaded) && typeof stlSubtFormat !== 'undefined') {
+        if ((stlAssLoaded || stlVttLoaded || stlSrtLoaded) && typeof stlSubtFormat !== 'undefined') {
             stlSubtFormatText.textContent = stlStrSubtFormat + ": " + stlSubtFormat;
         } else {
             stlSubtSrcText.textContent = stlStrNoSubtLoaded;
@@ -555,7 +562,7 @@ function stlInitUi() {
         if (stlAssLoaded) {
             document.getElementsByClassName("libassjs-canvas-parent")[0].remove();
             stlAssLoaded = false;
-        } else if (stlVttLoaded) {
+        } else if (stlVttLoaded || stlSrtLoaded) {
             if (!isSafari()) {
                 try {
                     video.textTracks[video.textTracks.length - 1].mode = "hidden";
@@ -565,9 +572,10 @@ function stlInitUi() {
                     stlShowMessage(stlStrNoSubtLoaded);
                     return;
                 }
+            }
             videoSubtitle.remove();
             stlVttLoaded = false;
-            }
+            stlSrtLoaded = false;
         } else {
             stlShowMessage(stlStrNoSubtLoaded);
             return;
@@ -788,6 +796,9 @@ function stlLoadSubtitleFromUrl(url, unselectDbSelect) {
                 }
             } else if (xhr.response.includes("[Script Info]")) {
                 stlLoadAssSubtitle("data:text/plain," + encodeURI(xhr.response), unselectDbSelect);
+            } else if (xhr.response.includes("-->")) {
+                stlShowSubtitle("data:text/srt," + encodeURI(srt2webvtt(xhr.response)), true);
+                setVideoSubtitleStyle("");
             } else {
                 stlShowMessage(stlStrInvalidSubtFormat);
             }
@@ -818,6 +829,7 @@ function stlLoadAssSubtitle(src, unselectDbSelect) {
         }
     }
     stlVttLoaded = false;
+    stlSrtLoaded = false;
     if (stlAssLoaded) {
         document.getElementsByClassName("libassjs-canvas-parent")[0].remove();
         stlAssLoaded = false;
@@ -871,7 +883,8 @@ function stlShowSubtitle(src, unselectDbSelect) {
         stlDbSelect.selectedIndex = 0;
         stlDbSelectPrevSelect = stlDbSelect.selectedIndex;
     }
-    stlVttLoaded = true;
+    if (src.startsWith("data:text/srt,")) stlSrtLoaded = true, stlVttLoaded = false;
+    else stlVttLoaded = true, stlSrtLoaded = false;
 };
 
 function stlShowMessage(str) {
@@ -894,4 +907,63 @@ function isSafari() {
     } else {
         return false;
     }
+}
+
+/* From https://github.com/silviapfeiffer/silviapfeiffer.github.io/blob/master/index.html */
+function srt2webvtt(data) {
+    // remove dos newlines
+    var srt = data.replace(/\r+/g, '');
+    // trim white space start and end
+    srt = srt.replace(/^\s+|\s+$/g, '');
+    // get cues
+    var cuelist = srt.split('\n\n');
+    var result = "";
+    if (cuelist.length > 0) {
+        result += "WEBVTT\n\n";
+        for (var i = 0; i < cuelist.length; i=i+1) {
+            result += convertSrtCue(cuelist[i]);
+        }
+    }
+    return result;
+}
+
+function convertSrtCue(caption) {
+    // remove all html tags for security reasons
+    //srt = srt.replace(/<[a-zA-Z\/][^>]*>/g, '');
+    var cue = "";
+    var s = caption.split(/\n/);
+    // concatenate muilt-line string separated in array into one
+    while (s.length > 3) {
+        for (var i = 3; i < s.length; i++) {
+            s[2] += "\n" + s[i]
+        }
+        s.splice(3, s.length - 3);
+    }
+    var line = 0;
+    // detect identifier
+    if (!s[0].match(/\d+:\d+:\d+/) && s[1].match(/\d+:\d+:\d+/)) {
+        cue += s[0].match(/\w+/) + "\n";
+        line += 1;
+    }
+    // get time strings
+    if (s[line].match(/\d+:\d+:\d+/)) {
+        // convert time string
+        var m = s[1].match(/(\d+):(\d+):(\d+)(?:,(\d+))?\s*--?>\s*(\d+):(\d+):(\d+)(?:,(\d+))?/);
+        if (m) {
+            cue += m[1]+":"+m[2]+":"+m[3]+"."+m[4]+" --> "
+                +m[5]+":"+m[6]+":"+m[7]+"."+m[8]+"\n";
+            line += 1;
+        } else {
+            // Unrecognized timestring
+            return "";
+        }
+    } else {
+        // file format error or comment lines
+        return "";
+    }
+    // get cue text
+    if (s[line]) {
+        cue += s[line] + "\n\n";
+    }
+    return cue;
 }
