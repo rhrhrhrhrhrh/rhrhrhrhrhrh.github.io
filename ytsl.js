@@ -130,7 +130,7 @@ var stlSrtLoaded = false;
 var workerUrl, legacyWorkerUrl, stlAssInstance;
 var stlSubtFormat;
 
-var stlVersion = 1.7, stlType = "b";
+var stlVersion = 1.8, stlType = "b";
 
 stlInitUi();
 
@@ -167,7 +167,7 @@ function stlInitUi() {
     var stlAutoLoadDb = localStorage.stlDisableAutoLoadDb != "true";
 
     var stlStyle = document.createElement("style");
-    stlStyle.innerHTML = '.stlLabel { float: left; font-size: 16px; margin-left: 2px; margin-right: 2px; } .stlLink { color: black !important; text-decoration: none !important; } .stlButton { background: none !important; border: none; padding: 0 !important; margin-top: 0 !important; margin-bottom: 0 !important; cursor: pointer; } ::cue { white-space: pre-wrap; background: rgba(8, 8, 8, 0.75) none repeat scroll 0% 0%; font-size: 33.0222px; color: #ffffff; fill: #ffffff; font-family: "YouTube Noto", Roboto, "Arial Unicode Ms", Arial, Helvetica, Verdana, "PT Sans Caption", sans-serif; } .stlMenuItem { width: 150px; text-align: left; } .stlSubtInfoItem { width: 300px; }';
+    stlStyle.innerHTML = '.stlLabel { float: left; font-size: 16px; margin-left: 2px; margin-right: 2px; } .stlLink { color: black !important; text-decoration: none !important; } .stlButton { background: none !important; border: none; padding: 0 !important; margin-top: 0 !important; margin-bottom: 0 !important; cursor: pointer; } ::cue { white-space: pre-wrap; background: rgba(8, 8, 8, 0.75) none repeat scroll 0% 0%; font-size: 33.0222px; color: #ffffff; fill: #ffffff; font-family: "YouTube Noto", Roboto, "Arial Unicode Ms", Arial, Helvetica, Verdana, "PT Sans Caption", sans-serif; } .stlMenuItem { width: 150px; text-align: left; } .stlSubtInfoItem { width: 350px; }';
     if (userLang.includes("ko")) {
         stlStyle.innerHTML += ".stlLabelEngOnly { margin-top: 1px; }";
     }
@@ -186,7 +186,7 @@ function stlInitUi() {
     var stlMenuBackground = document.createElement("div");
     stlMenuBackground.style = "display: none; position: fixed; height: 100vh; width: 100vw; background: rgba(0, 0, 0, 0.5); z-index: 5000;";
     stlMenuBackground.onclick = function () {
-        this.style.display = "none";
+        fadeOut(this);
     }
     document.body.appendChild(stlMenuBackground);
 
@@ -200,9 +200,10 @@ function stlInitUi() {
     var stlMenuCloseBtn = document.createElement("button");
     stlMenuCloseBtn.textContent = "X";
     stlMenuCloseBtn.className = "stlLabel stlButton stlMenuItem";
-    stlMenuCloseBtn.style = "float: right; width: 50px !important; text-align: right; font-weight: bold;"
+    stlMenuCloseBtn.style = "float: right; width: auto; text-align: right; font-weight: bold;"
+    stlMenuCloseBtn.title = stlStrClose;
     stlMenuCloseBtn.onclick = function () {
-        stlMenuBackground.style.display = "none";
+        fadeOut(stlMenuBackground);
     };
     stlMenu.appendChild(stlMenuCloseBtn);
 
@@ -224,7 +225,7 @@ function stlInitUi() {
             var str = prompt(stlStrEnterFontSizeDialog);
             if (str == null) return;
             videoSubtitleStyleForFontSize.innerHTML = "::cue { font-size: " + (isNaN(str) ? str : str + "px") + "; }";
-            stlMenuBackground.style.display = "none";
+            fadeOut(stlMenuBackground);
             stlShowMessage(stlStrFontSizeChanged);
         })
     };
@@ -254,7 +255,7 @@ function stlInitUi() {
     stlClearSettingsBtn.onclick = function () {
         localStorage.removeItem("stlNoticeIgnore");
         localStorage.removeItem("stlDisableAutoLoadDb");
-        stlMenuBackground.style.display = "none";
+        fadeOut(stlMenuBackground);
         stlAlert(stlStrDone);
     };
     stlMenu.appendChild(stlClearSettingsBtn);
@@ -264,7 +265,7 @@ function stlInitUi() {
     stlGitHubBtn.className = "stlLabel stlButton stlMenuItem";
     stlGitHubBtn.onclick = function () {
         window.open("https://github.com/rhrhrhrhrhrh/YTSubtitleLoader");
-        stlMenuBackground.style.display = "none";
+        fadeOut(stlMenuBackground);
     };
     //stlMenu.appendChild(stlGitHubBtn);
 
@@ -273,7 +274,7 @@ function stlInitUi() {
     stlPrivPolBtn.className = "stlLabel stlButton stlMenuItem";
     stlPrivPolBtn.onclick = function () {
         window.open(stlServerUrl + "/privacypolicy.php");
-        stlMenuBackground.style.display = "none";
+        fadeOut(stlMenuBackground);
     };
     stlMenu.appendChild(stlPrivPolBtn);
 
@@ -282,7 +283,7 @@ function stlInitUi() {
     stlOpenSrcBtn.className = "stlLabel stlButton stlMenuItem";
     stlOpenSrcBtn.onclick = function () {
         window.open(stlServerUrl + "/opensource.php");
-        stlMenuBackground.style.display = "none";
+        fadeOut(stlMenuBackground);
     };
     stlMenu.appendChild(stlOpenSrcBtn);
 
@@ -295,12 +296,12 @@ function stlInitUi() {
     var stlSubtInfoBackground = document.createElement("div");
     stlSubtInfoBackground.style = "display: none; position: fixed; height: 100vh; width: 100vw; background: rgba(0, 0, 0, 0.5); z-index: 5000;";
     stlSubtInfoBackground.onclick = function () {
-        this.style.display = "none";
+        fadeOut(this);
     }
     document.body.appendChild(stlSubtInfoBackground);
 
     var stlSubtInfoWindow = document.createElement("div");
-    stlSubtInfoWindow.style = "background: #ffffff; height: 250px; width: 300px; position: absolute; top: 50%; left: 50%; margin-top: -125px; margin-left: -150px; padding: 12px;";
+    stlSubtInfoWindow.style = "background: #ffffff; height: 250px; width: 350px; position: absolute; top: 50%; left: 50%; margin-top: -125px; margin-left: -175px; padding: 12px;";
     stlSubtInfoWindow.onclick = function (event) {
         event.stopPropagation();
     }
@@ -309,9 +310,10 @@ function stlInitUi() {
     var stlSubtInfoCloseBtn = document.createElement("button");
     stlSubtInfoCloseBtn.textContent = "X";
     stlSubtInfoCloseBtn.className = "stlLabel stlButton stlMenuItem stlSubtInfoItem";
-    stlSubtInfoCloseBtn.style = "float: right; width: 20px !important; text-align: right; font-weight: bold;"
+    stlSubtInfoCloseBtn.style = "float: right; width: auto; text-align: right; font-weight: bold;"
+    stlSubtInfoCloseBtn.title = stlStrClose;
     stlSubtInfoCloseBtn.onclick = function () {
-        stlSubtInfoBackground.style.display = "none";
+        fadeOut(stlSubtInfoBackground);
     };
     stlSubtInfoWindow.appendChild(stlSubtInfoCloseBtn);
 
@@ -351,7 +353,7 @@ function stlInitUi() {
     var stlMessageBoxBackground = document.createElement("div");
     stlMessageBoxBackground.style = "display: none; position: fixed; height: 100vh; width: 100vw; background: rgba(0, 0, 0, 0.5); z-index: 5000;";
     stlMessageBoxBackground.onclick = function () {
-        this.style.display = "none";
+        fadeOut(this);
     }
     document.body.appendChild(stlMessageBoxBackground);
 
@@ -365,23 +367,24 @@ function stlInitUi() {
     var stlMessageBoxCloseBtn = document.createElement("button");
     stlMessageBoxCloseBtn.textContent = "X";
     stlMessageBoxCloseBtn.className = "stlLabel stlButton stlMenuItem";
-    stlMessageBoxCloseBtn.style = "float: right; width: 20px !important; text-align: right; font-weight: bold;"
+    stlMessageBoxCloseBtn.style = "float: right; width: auto; text-align: right; font-weight: bold;"
+    stlMessageBoxCloseBtn.title = stlStrClose;
     stlMessageBoxCloseBtn.onclick = function () {
-        stlMessageBoxBackground.style.display = "none";
+        fadeOut(stlMessageBoxBackground);
     };
     stlMessageBox.appendChild(stlMessageBoxCloseBtn);
 
     var stlMessageBoxText = document.createElement("p");
-    stlMessageBoxText.className = "stlLabel stlSubtInfoItem";
-    stlMessageBoxText.style = "height: 55px; text-align: center; display: table-cell; vertical-align: middle; word-wrap: break-word;";
+    stlMessageBoxText.className = "stlLabel";
+    stlMessageBoxText.style = "width: 300px; height: 55px; text-align: center; display: table-cell; vertical-align: middle; word-wrap: break-word;";
     stlMessageBox.appendChild(stlMessageBoxText);
 
     var stlMessageBoxOkBtn = document.createElement("buttton");
     stlMessageBoxOkBtn.textContent = stlStrOk;
-    stlMessageBoxOkBtn.className = "stlLabel stlButton stlMenuItem stlSubtInfoItem";
-    stlMessageBoxOkBtn.style = "text-align: center; position: absolute; left: 12px; bottom: 12px;";
+    stlMessageBoxOkBtn.className = "stlLabel stlButton stlMenuItem";
+    stlMessageBoxOkBtn.style = "text-align: center; width: 300px; position: absolute; left: 12px; bottom: 12px;";
     stlMessageBoxOkBtn.onclick = function () {
-        stlMessageBoxBackground.style.display = "none";
+        fadeOut(stlMessageBoxBackground);
     };
     stlMessageBox.appendChild(stlMessageBoxOkBtn);
 
@@ -399,7 +402,7 @@ function stlInitUi() {
         var reader = new FileReader();
         reader.onload = function () {
             if (reader.result.includes("WEBVTT")) {
-                stlShowSubtitle("data:text/vtt," + encodeURI(reader.result.split("YTSLJS")[0]), true);
+                stlShowSubtitle("data:text/vtt," + encodeURIComponent(reader.result.split("YTSLJS")[0]), true);
                 if (typeof reader.result.split("YTSLJS")[1] !== 'undefined') {
                     if (stlRanJsSubtOnce) alert(stlStrSecondJsAlert);
                     if (confirm(stlStrConfirmJs)) {
@@ -411,11 +414,13 @@ function stlInitUi() {
                 }
                 stlSubtSrcText.textContent = stlStrSubtSrc + ": " + stlStrFile;
             } else if (reader.result.includes("[Script Info]")) {
-                stlLoadAssSubtitle("data:text/plain," + encodeURI(reader.result), true);
+                stlLoadAssSubtitle("data:text/plain," + encodeURIComponent(reader.result), true);
                 stlSubtSrcText.textContent = stlStrSubtSrc + ": " + stlStrFile;
-            } else if (reader.result.includes("-->")) {
-                stlShowSubtitle("data:text/srt," + encodeURI(srt2webvtt(reader.result)), true);
+            } else if (reader.result.includes(" --> ")) {
+                stlSrtLoaded = true;
+                stlShowSubtitle("data:text/vtt," + encodeURIComponent(srt2webvtt(reader.result)), true);
                 setVideoSubtitleStyle("");
+                stlSubtSrcText.textContent = stlStrSubtSrc + ": " + stlStrFile;
             } else {
                 stlShowMessage(stlStrInvalidSubtFormat);
             }
@@ -531,7 +536,7 @@ function stlInitUi() {
             stlSubtSrcText.textContent = stlStrNoSubtLoaded;
             stlSubtFormatText.textContent = "";
         }
-        stlSubtInfoBackground.style.display = "block";
+        fadeIn(stlSubtInfoBackground);
     };
     stlContainer.appendChild(stlDbSubtInfoBtn);
 
@@ -576,7 +581,7 @@ function stlInitUi() {
     stlMenuBtn.textContent = stlStrMenu;
     stlMenuBtn.className = "stlLabel stlButton";
     stlMenuBtn.onclick = function () {
-        stlMenuBackground.style.display = "block";
+        fadeIn(stlMenuBackground);
     };
     stlMenuBtn.onmouseup = function (event) {
         if (event.button == 1) {
@@ -701,14 +706,14 @@ function stlInitUi() {
         if (prevUrl != window.location.href) {
             setTimeout(function () {
                 video = document.getElementsByTagName("video")[0];
-                if (!isSafari()) {
-                    try {
+                try {
+                    if (!isSafari()) {
                         video.textTracks[video.textTracks.length - 1].mode = "hidden";
                         console.log("YTSubtitleLoader: video.textTracks.mode = hidden was done");
-                        videoSubtitle.remove();
-                    } catch (e) {
-                        console.log(e);
                     }
+                    videoSubtitle.remove();
+                } catch (e) {
+                    console.log(e);
                 }
                 if (stlAutoLoadDb && parseVideoId() !== null) {
                     stlDbRefresh();
@@ -737,7 +742,7 @@ function stlInitUi() {
 
     function stlAlert(str) {
         stlMessageBoxText.textContent = str;
-        stlMessageBoxBackground.style.display = "block";
+        fadeIn(stlMessageBoxBackground);
     }
 
     function stlDbg(fn) {
@@ -767,7 +772,7 @@ function stlLoadSubtitleFromUrl(url, unselectDbSelect) {
     xhr.onload = function () {
         if (xhr.status == 200) {
             if (xhr.response.includes("WEBVTT")) {
-                stlShowSubtitle("data:text/vtt," + encodeURI(xhr.response.split("YTSLJS")[0]), unselectDbSelect)
+                stlShowSubtitle("data:text/vtt," + encodeURIComponent(xhr.response.split("YTSLJS")[0]), unselectDbSelect)
                 if (typeof xhr.response.split("YTSLJS")[1] !== 'undefined') {
                     if (stlRanJsSubtOnce) alert(stlStrSecondJsAlert);
                     if (confirm(stlStrConfirmJs)) {
@@ -778,9 +783,10 @@ function stlLoadSubtitleFromUrl(url, unselectDbSelect) {
                     setVideoSubtitleStyle("");
                 }
             } else if (xhr.response.includes("[Script Info]")) {
-                stlLoadAssSubtitle("data:text/plain," + encodeURI(xhr.response), unselectDbSelect);
-            } else if (xhr.response.includes("-->")) {
-                stlShowSubtitle("data:text/srt," + encodeURI(srt2webvtt(xhr.response)), unselectDbSelect);
+                stlLoadAssSubtitle("data:text/plain," + encodeURIComponent(xhr.response), unselectDbSelect);
+            } else if (xhr.response.includes(" --> ")) {
+                stlSrtLoaded = true;
+                stlShowSubtitle("data:text/vtt," + encodeURIComponent(srt2webvtt(xhr.response)), unselectDbSelect);
                 setVideoSubtitleStyle("");
             } else {
                 stlShowMessage(stlStrInvalidSubtFormat);
@@ -802,14 +808,14 @@ function stlLoadSubtitleFromUrl(url, unselectDbSelect) {
 };
 
 function stlLoadAssSubtitle(src, unselectDbSelect) {
-    if (!isSafari()) {
-        try {
+    try {
+        if (!isSafari()) {
             video.textTracks[video.textTracks.length - 1].mode = "hidden";
             console.log("YTSubtitleLoader: video.textTracks.mode = hidden was done");
-            videoSubtitle.remove();
-        } catch (e) {
-            console.log(e);
         }
+        videoSubtitle.remove();
+    } catch (e) {
+        console.log(e);
     }
     stlVttLoaded = false;
     stlSrtLoaded = false;
@@ -866,7 +872,7 @@ function stlShowSubtitle(src, unselectDbSelect) {
         stlDbSelect.selectedIndex = 0;
         stlDbSelectPrevSelect = stlDbSelect.selectedIndex;
     }
-    if (src.startsWith("data:text/srt,")) stlSrtLoaded = true, stlVttLoaded = false;
+    if (stlSrtLoaded) stlVttLoaded = false;
     else stlVttLoaded = true, stlSrtLoaded = false;
 };
 
@@ -890,6 +896,43 @@ function isSafari() {
     } else {
         return false;
     }
+}
+
+function fadeIn(elem) {
+    var i = 0.1;
+    elem.style.opacity = i;
+    elem.style.filter = "alpha(opacity=" + i * 100 + ")";
+    elem.style.display = "block";
+    var interval = setInterval(function () {
+        if (i >= 1){
+            clearInterval(interval);
+        }
+        elem.style.opacity = i;
+        elem.style.filter = "alpha(opacity=" + i * 100 + ")";
+        i += i * 0.1;
+    }, 10);
+    setTimeout(function() {
+        clearInterval(interval);
+        elem.style.opacity = 1;
+        elem.style.filter = "alpha(opacity=" + 100 + ")";
+    }, 500);
+}
+
+function fadeOut(elem) {
+    var i = 1; 
+    var interval = setInterval(function () {
+        if (i <= 0.1){
+            clearInterval(interval);
+            elem.style.display = "none";
+        }
+        elem.style.opacity = i;
+        elem.style.filter = "alpha(opacity=" + i * 100 + ")";
+        i -= i * 0.1;
+    }, 10);
+    setTimeout(function() {
+        clearInterval(interval);
+        elem.style.display = "none";
+    }, 500);
 }
 
 /* From https://github.com/silviapfeiffer/silviapfeiffer.github.io/blob/master/index.html */
