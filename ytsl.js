@@ -655,7 +655,7 @@ function stlInitUi() {
                             def = true;
                             fullMatched = true;
                         } else {
-                            if (stlDbSubtitles[i].langCode.substring(0, 2).toLowerCase() == userLang.substring(0, 2).toLowerCase() && !fullMatched) { //Partial match e.g. ko-KR - ko
+                            if (stlDbSubtitles[i].langCode.substring(0, 2).toLowerCase() == userLang.substring(0, 2).toLowerCase() && !predefined && !fullMatched) { //Partial match e.g. ko-KR - ko
                                 def = true;
                             }
                         }
