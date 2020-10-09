@@ -659,13 +659,14 @@ function stlInitUi() {
                 stlDbSelect.disabled = false;
                 stlDbSelectPlaceholder.text = stlStrNotSelected;
                 stlDbSubtitles = JSON.parse(xhr.response);
-                var fullMatched = false;
+                var predefined = false, fullMatched = false;
                 for (var i = 0; i < stlDbSubtitles.length; i++) {
                     var def = false;
                     if (stlDbSubtitles[i].default) { //Server admin defined priority
                         def = true;
+                        predefined = true;
                     } else {
-                        if (stlDbSubtitles[i].langCode.toLowerCase() == userLang.toLowerCase()) { //Full match e.g. ko-KR - ko-KR
+                        if (stlDbSubtitles[i].langCode.toLowerCase() == userLang.toLowerCase() && !predefined) { //Full match e.g. ko-KR - ko-KR
                             def = true;
                             fullMatched = true;
                         } else {
