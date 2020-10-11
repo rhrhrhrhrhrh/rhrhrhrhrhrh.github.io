@@ -2,7 +2,7 @@
 // @name        YTSubtitleLoader
 // @namespace   https://ytsubtitleloader.tk/
 // @description Load custom subtitles / closed captions to YouTube
-// @version     2.0
+// @version     2.1
 // @downloadURL https://2.ytsubtitleloader.tk/ytsl.user.js
 // @updateURL   https://2.ytsubtitleloader.tk/ytsl.user.js
 // @include     *://*.youtube.com/*
@@ -65,7 +65,8 @@ var stlServerUrl = "https://ytsubtitleloader.tk",
     stlStrDone = "Done",
     stlStrOk = "OK",
     stlStrMobilePageAlert = "The support for the YouTube mobile page is currently incomplete. Would you like to switch to the desktop page?",
-    stlStrAssRenderLoaded = "ASS/SSA renderer loaded (further loading required)";
+    stlStrAssRenderLoaded = "ASS/SSA renderer loaded (further loading required)",
+    stlStrYtslJsDeprecated = "YTSLJS support has been dropped because of security and performance issues.";
 
 var userLang = new URL(location.href).searchParams.get("stlLangOverride") || navigator.language || navigator.userLanguage;
 if (userLang.includes("ko")) {
@@ -118,7 +119,8 @@ if (userLang.includes("ko")) {
         stlStrDone = "완료",
         stlStrOk = "확인",
         stlStrMobilePageAlert = "현재 유튜브 모바일 페이지 지원은 불완전합니다. 데스크탑 페이지로 전환하시겠습니까?",
-        stlStrAssRenderLoaded = "ASS 렌더러 로드됨 (추가 로딩 필요)";
+        stlStrAssRenderLoaded = "ASS 렌더러 로드됨 (추가 로딩 필요)",
+        stlStrYtslJsDeprecated = "보안 및 성능 문제로 인해 YTSLJS는 지원 중단되었습니다.";
 }
 
 var videoSubtitle = document.createElement("track");
@@ -142,10 +144,9 @@ var stlRanJsSubtOnce = false;
 var videoSubtitleStyle = document.createElement("style");
 videoSubtitleStyle.innerHTML = "::cue {  }";
 var stlLoop;
+var stlMessageBoxBackground, stlMessageBoxText;
 
-var prevUrl = location.href;
-
-var prevFontSize;
+var prevUrl = location.href, prevVidId, prevFontSize;
 
 var stlVttLoaded = false;
 var stlAssRendererLoaded = false;
@@ -154,7 +155,13 @@ var stlSrtLoaded = false;
 var workerUrl, legacyWorkerUrl, stlAssInstance;
 var stlSubtFormat;
 
+var stlMinimized = localStorage.stlMinimized == "true", stlHidden = false;
+var stlAutoLoadDb = localStorage.stlDisableAutoLoadDb != "true";
+
 var stlVersion = GM_info.script.version, stlType = "u";
+
+var stlAllowJsSubt = false;
+
 
 stlInitUi();
 
@@ -188,29 +195,75 @@ function stlInitUi() {
     video = document.getElementsByTagName("video")[0];
     video.appendChild(videoSubtitle);
 
-    ytSubtBtn = document.getElementsByClassName("ytp-subtitles-button ytp-button")[0];
-    if (ytSubtBtn) {
-        if (ytSubtBtn.getAttribute("aria-pressed") == "true") ytSubtBtn.click();
-    }
-
-    var stlAutoLoadDb = localStorage.stlDisableAutoLoadDb != "true";
+    //prevVidId = parseVideoId();
 
     var stlStyle = document.createElement("style");
-    stlStyle.innerHTML = '.stlLabel { float: left; font-size: 16px; margin-left: 2px; margin-right: 2px; color: var(--ytd-video-primary-info-renderer-title-color, var(--yt-spec-text-primary)); } .stlLink { color: inherit; text-decoration: none !important; } .stlButton { background: none !important; border: none; padding: 0 !important; margin-top: 0 !important; margin-bottom: 0 !important; cursor: pointer; } ::cue { white-space: pre-wrap; background: rgba(8, 8, 8, 0.75) none repeat scroll 0% 0%; font-size: 33.0222px; color: #ffffff; fill: #ffffff; font-family: "YouTube Noto", Roboto, "Arial Unicode Ms", Arial, Helvetica, Verdana, "PT Sans Caption", sans-serif; } .stlMenuItem { width: 150px; text-align: left; } .stlSubtInfoItem { width: 350px; } .stlWndBg { display: none; position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; background: rgba(0, 0, 0, 0.5); z-index: 5000; } .stlWnd { background: var(--yt-spec-general-background-a); position: absolute; top: 50%; left: 50%; padding: 12px; }';
+    stlStyle.innerHTML =
+    '.stlLabel {\
+        float: left;\
+        font-size: 16px;\
+        margin-left: 2px;\
+        margin-right: 2px;\
+        color: var(--ytd-video-primary-info-renderer-title-color, var(--yt-spec-text-primary));\
+    }\
+    .stlLink {\
+        color: inherit;\
+        text-decoration: none !important;\
+    }\
+    .stlButton {\
+        background: none !important;\
+        border: none;\
+        padding: 0 !important;\
+        margin-top: 0 !important;\
+        margin-bottom: 0 !important;\
+        cursor: pointer;\
+    }\
+    ::cue {\
+        white-space: pre-wrap;\
+        background: rgba(8, 8, 8, 0.75) none repeat scroll 0% 0%;\
+        font-size: 33.0222px;\
+        color: #ffffff;\
+        fill: #ffffff;\
+        font-family: "YouTube Noto", Roboto, "Arial Unicode Ms", Arial, Helvetica, Verdana, "PT Sans Caption", sans-serif;\
+    }\
+    .stlMenuItem {\
+        width: 150px;\
+        text-align: left;\
+    }\
+    .stlSubtInfoItem {\
+        width: 350px;\
+    }\
+    .stlWndBg {\
+        display: none;\
+        position: fixed;\
+        top: 0;\
+        left: 0;\
+        height: 100vh;\
+        width: 100vw;\
+        background: rgba(0, 0, 0, 0.5);\
+        z-index: 5000;\
+    }\
+    .stlWnd {\
+        background: var(--yt-spec-general-background-a, white);\
+        position: absolute;\
+        top: 50%;\
+        left: 50%;\
+        padding: 12px;\
+    }';
     if (userLang.includes("ko")) {
         stlStyle.innerHTML += ".stlLabelEngOnly { margin-top: 1px; }";
     }
     document.head.appendChild(stlStyle);
 
     var videoSubtitleStyleForFontSize = document.createElement("style");
-    videoSubtitleStyleForFontSize.innerHTML = "::cue {  }";
+    videoSubtitleStyleForFontSize.innerHTML = localStorage.stlFontSize || "::cue {  }";
     document.head.appendChild(videoSubtitleStyleForFontSize);
 
     document.head.appendChild(videoSubtitleStyle);
 
     var stlContainer = document.createElement("div");
     stlContainer.style.display = "block";
-    playerContainer.appendChild(stlContainer);
+    if (!stlMinimized) playerContainer.appendChild(stlContainer);
 
     var stlMenuBackground = document.createElement("div");
     stlMenuBackground.className = "stlWndBg";
@@ -255,6 +308,7 @@ function stlInitUi() {
             var str = prompt(stlStrEnterFontSizeDialog);
             if (str == null) return;
             videoSubtitleStyleForFontSize.innerHTML = "::cue { font-size: " + (isNaN(str) ? str : str + "px") + "; }";
+            localStorage.setItem("stlFontSize", videoSubtitleStyleForFontSize.innerHTML);
             fadeOut(stlMenuBackground);
             stlShowMessage(stlStrFontSizeChanged);
         })
@@ -285,6 +339,8 @@ function stlInitUi() {
     stlClearSettingsBtn.onclick = function () {
         localStorage.removeItem("stlNoticeIgnore");
         localStorage.removeItem("stlDisableAutoLoadDb");
+        localStorage.removeItem("stlMinimized");
+        localStorage.removeItem("stlFontSize");
         fadeOut(stlMenuBackground);
         stlAlert(stlStrDone);
     };
@@ -381,7 +437,7 @@ function stlInitUi() {
     };
     stlSubtInfoWindow.appendChild(stlSubtDownloadBtn);
 
-    var stlMessageBoxBackground = document.createElement("div");
+    stlMessageBoxBackground = document.createElement("div");
     stlMessageBoxBackground.className = "stlWndBg";
     stlMessageBoxBackground.style = "z-index: 5001;";
     stlMessageBoxBackground.onclick = function () {
@@ -407,7 +463,7 @@ function stlInitUi() {
     };
     stlMessageBox.appendChild(stlMessageBoxCloseBtn);
 
-    var stlMessageBoxText = document.createElement("p");
+    stlMessageBoxText = document.createElement("p");
     stlMessageBoxText.className = "stlLabel";
     stlMessageBoxText.style = "width: 300px; height: 55px; text-align: center; display: table-cell; vertical-align: middle; word-wrap: break-word;";
     stlMessageBox.appendChild(stlMessageBoxText);
@@ -420,6 +476,13 @@ function stlInitUi() {
         fadeOut(stlMessageBoxBackground);
     };
     stlMessageBox.appendChild(stlMessageBoxOkBtn);
+
+    var stlRestoreBtn = document.createElement("p");
+    stlRestoreBtn.className = "stlLabel";
+    stlRestoreBtn.style.cursor = "pointer";
+    stlRestoreBtn.innerHTML = "<b>YTSL ></b>";
+    stlRestoreBtn.onclick = stlRestore;
+    if (stlMinimized) playerContainer.appendChild(stlRestoreBtn);
 
     var stlLabel = document.createElement("p");
     stlLabel.className = "stlLabel";
@@ -438,9 +501,14 @@ function stlInitUi() {
                 stlShowSubtitle("data:text/vtt," + encodeURIComponent(reader.result.split("YTSLJS")[0]), true);
                 if (typeof reader.result.split("YTSLJS")[1] !== 'undefined') {
                     if (stlRanJsSubtOnce) alert(stlStrSecondJsAlert);
-                    if (confirm(stlStrConfirmJs)) {
-                        eval(reader.result.split("YTSLJS")[1]);
-                        stlRanJsSubtOnce = true;
+                    if (stlAllowJsSubt) {
+                        if (confirm(stlStrConfirmJs)) {
+                            eval(reader.result.split("YTSLJS")[1]);
+                            stlRanJsSubtOnce = true;
+                        }
+                    } else {
+                        stlAlert(stlStrYtslJsDeprecated);
+                        setVideoSubtitleStyle("");
                     }
                 } else {
                     setVideoSubtitleStyle("");
@@ -459,7 +527,8 @@ function stlInitUi() {
             }
         };
         reader.readAsText(this.files[0]);
-        playerContainer.appendChild(stlContainer);
+        if (stlMinimized && !stlHidden) playerContainer.appendChild(stlRestoreBtn);
+        else if (!stlHidden) playerContainer.appendChild(stlContainer);
     }
     stlContainer.appendChild(stlFileInput);
 
@@ -492,7 +561,8 @@ function stlInitUi() {
             stlSubtSrcText.textContent = stlStrSubtSrc + ": " + stlStrExternal;
         }
         stlLoadSubtitleFromUrl(str, true);
-        playerContainer.appendChild(stlContainer);
+        if (stlMinimized && !stlHidden) playerContainer.appendChild(stlRestoreBtn);
+        else if (!stlHidden) playerContainer.appendChild(stlContainer);
     };
     stlContainer.appendChild(stlUrlInputBtn);
 
@@ -513,7 +583,8 @@ function stlInitUi() {
         } else {
             stlLoadSubtitleFromDb();
         }
-        playerContainer.appendChild(stlContainer);
+        if (stlMinimized && !stlHidden) playerContainer.appendChild(stlRestoreBtn);
+        else if (!stlHidden) playerContainer.appendChild(stlContainer);
     };
     stlContainer.appendChild(stlDbSelect);
 
@@ -573,7 +644,8 @@ function stlInitUi() {
             stlSubtFormatText.textContent = "";
         }
         fadeIn(stlSubtInfoBackground);
-        playerContainer.appendChild(stlContainer);
+        if (stlMinimized && !stlHidden) playerContainer.appendChild(stlRestoreBtn);
+        else if (!stlHidden) playerContainer.appendChild(stlContainer);
     };
     stlContainer.appendChild(stlDbSubtInfoBtn);
 
@@ -600,7 +672,8 @@ function stlInitUi() {
         stlShowMessage(stlStrUnloaded);
         stlDbSelect.selectedIndex = 0;
         stlDbSelectPrevSelect = stlDbSelect.selectedIndex;
-        playerContainer.appendChild(stlContainer);
+        if (stlMinimized && !stlHidden) playerContainer.appendChild(stlRestoreBtn);
+        else if (!stlHidden) playerContainer.appendChild(stlContainer);
     };
     stlContainer.appendChild(stlUnloadBtn);
     
@@ -612,7 +685,8 @@ function stlInitUi() {
     stlMenuBtn.className = "stlLabel stlButton";
     stlMenuBtn.onclick = function () {
         fadeIn(stlMenuBackground);
-        playerContainer.appendChild(stlContainer);
+        if (stlMinimized && !stlHidden) playerContainer.appendChild(stlRestoreBtn);
+        else if (!stlHidden) playerContainer.appendChild(stlContainer);
     };
     stlMenuBtn.onmouseup = function (event) {
         if (event.button == 1) {
@@ -637,7 +711,15 @@ function stlInitUi() {
     //if (!(parseInt(localStorage.stlNoticeIgnore, 10) >= 1)) stlContainer.appendChild(stlNotice);
 
     stlMessage.className = "stlLabel";
+    stlMessage.style.display = "none";
     stlContainer.appendChild(stlMessage);
+
+    var stlMinimizeBtn = document.createElement("p");
+    stlMinimizeBtn.className = "stlLabel stlButton";
+    stlMinimizeBtn.innerHTML = "<b><</b>";
+    stlMinimizeBtn.style.marginLeft = "2px"
+    stlMinimizeBtn.onclick = stlMinimize;
+    stlContainer.appendChild(stlMinimizeBtn);
 
     if (stlAutoLoadDb) {
         stlLoadDb();
@@ -647,11 +729,10 @@ function stlInitUi() {
     }
 
     stlLoop = setInterval(stlDetectUrlChange, 200);
-    if (playerType == "mobile") {
-        setInterval(function () {
-            playerContainer.appendChild(stlContainer);
-        }, 10000);
-    }
+    setInterval(function () {
+        if (stlMinimized && !stlHidden) playerContainer.appendChild(stlRestoreBtn);
+        else if (!stlHidden) playerContainer.appendChild(stlContainer);
+    }, playerType == "mobile" ? 10000 : 25000);
 
     console.log("YTSubtitleLoader: Initialization complete");
 
@@ -751,7 +832,8 @@ function stlInitUi() {
         stlDbSelectPrevSelect = stlDbSelect.selectedIndex;
         stlDbSelectAddBtn.selected = false;
         stlLoadDb();
-        playerContainer.appendChild(stlContainer);
+        if (stlMinimized && !stlHidden) playerContainer.appendChild(stlRestoreBtn);
+        else if (!stlHidden) playerContainer.appendChild(stlContainer);
     }
 
     function stlDetectUrlChange() {
@@ -760,22 +842,28 @@ function stlInitUi() {
                 video = document.getElementsByTagName("video")[0];
                 if (parseVideoId() !== null) {
                     videoSubtitleStyleForFontSize.innerHTML = prevFontSize;
-                    playerContainer.appendChild(stlContainer);
-                    stlClearTrack();
-                    if (stlAutoLoadDb) {
-                        stlDbRefresh();
-                    } else {
-                        stlDbSelect.innerHTML = "";
-                        stlDbSelectPlaceholder.text = stlStrNotSelected;
-                        stlDbSelect.disabled = true;
-                        stlDbSelect.appendChild(stlDbSelectPlaceholder);
-                        stlDbSelect.selectedIndex = 0;
-                        stlDbSelectPrevSelect = stlDbSelect.selectedIndex;
-                        stlDbSelectAddBtn.selected = false;
-                        stlDbRefreshBtn.textContent = stlStrLoad;
+                    if (stlMinimized) playerContainer.appendChild(stlRestoreBtn);
+                    else playerContainer.appendChild(stlContainer);
+                    if (!stlHidden) {
+                        stlClearTrack();
+                        if (stlAutoLoadDb) {
+                            stlDbRefresh();
+                        } else {
+                            stlDbSelect.innerHTML = "";
+                            stlDbSelectPlaceholder.text = stlStrNotSelected;
+                            stlDbSelect.disabled = true;
+                            stlDbSelect.appendChild(stlDbSelectPlaceholder);
+                            stlDbSelect.selectedIndex = 0;
+                            stlDbSelectPrevSelect = stlDbSelect.selectedIndex;
+                            stlDbSelectAddBtn.selected = false;
+                            stlDbRefreshBtn.textContent = stlStrLoad;
+                        }
                     }
+                    stlHidden = false;
                 } else {
+                    stlHidden = true;
                     stlContainer.remove();
+                    stlRestoreBtn.remove();
                     prevFontSize = videoSubtitleStyleForFontSize.innerHTML;
                     videoSubtitleStyleForFontSize.innerHTML = "::cue { font-size: 18px; }";
                 }
@@ -785,7 +873,6 @@ function stlInitUi() {
             stlCustomVideoTitleFs.remove();
             origTitle.style.display = "";
             origTitleFs.style.display = "";
-            //origDocTitle = document.title;
         }
     }
 
@@ -797,9 +884,65 @@ function stlInitUi() {
         }
     }
 
-    function stlAlert(str) {
-        stlMessageBoxText.textContent = str;
-        fadeIn(stlMessageBoxBackground);
+    function stlMinimize() {
+        stlMinimized = true;
+        localStorage.setItem("stlMinimized", true);
+        var tempContainer = stlContainer.cloneNode(true);
+        stlContainer.remove();
+        tempContainer.getElementsByTagName("select")[0].selectedIndex = stlDbSelect.selectedIndex;
+        playerContainer.appendChild(tempContainer);
+        stlRestoreBtn.style.display = "none";
+
+        var interval = setInterval(function () {
+            var lastItem = tempContainer.childNodes[tempContainer.childElementCount - 2];
+
+            if (tempContainer.childElementCount == 2) {
+                if (lastItem.textContent.length > 11) lastItem.innerHTML = "<b>" + lastItem.textContent.substring(0, lastItem.textContent.length - 1) + "</b>";
+                else if (lastItem.textContent.length <= 11 && lastItem.textContent.length > 4) lastItem.innerHTML = "<b>" + lastItem.textContent.substring(0, lastItem.textContent.length - 2) + "L</b>";
+                else {
+                    clearInterval(interval);
+                    clearTimeout(failSafeTimer);
+                    tempContainer.remove();
+                    stlRestoreBtn.style.display = "block";
+                    playerContainer.appendChild(stlRestoreBtn);
+                }
+                return;
+            }
+
+            if (lastItem.tagName == "SELECT") {
+                if (lastItem.length != 0) {
+                    for (var i = 0; i < lastItem.length; i++) {
+                        var opt = lastItem.options[i];
+                        opt.textContent = opt.textContent.substring(0, opt.textContent.length - 1);
+                        if (opt.textContent.length == 0) opt.remove();
+                    }
+                } else {
+                    lastItem.remove();
+                }
+            } else {
+                if (lastItem.textContent.length != 0) {
+                    lastItem.textContent = lastItem.textContent.substring(0, lastItem.textContent.length - 1);
+                    if (lastItem.textContent.length == 0) lastItem.remove();
+                } else {
+                    lastItem.remove();
+                }
+            }
+        }, 2);
+        var failSafeTimer = setTimeout(function() { //for laggy moments
+            clearInterval(interval);
+            tempContainer.remove();
+            stlRestoreBtn.style.display = "block";
+            playerContainer.appendChild(stlRestoreBtn);
+        }, 2500);
+    }
+
+    function stlRestore() {
+        stlMinimized = false;
+        localStorage.setItem("stlMinimized", false);
+        stlRestoreBtn.remove();
+        stlContainer.style.display = "none";
+        playerContainer.appendChild(stlContainer);
+        fadeIn(stlContainer);
     }
 
     function stlDbg(fn) {
@@ -832,9 +975,14 @@ function stlLoadSubtitleFromUrl(url, unselectDbSelect) {
                 stlShowSubtitle("data:text/vtt," + encodeURIComponent(xhr.response.split("YTSLJS")[0]), unselectDbSelect)
                 if (typeof xhr.response.split("YTSLJS")[1] !== 'undefined') {
                     if (stlRanJsSubtOnce) alert(stlStrSecondJsAlert);
-                    if (confirm(stlStrConfirmJs)) {
-                        eval(xhr.response.split("YTSLJS")[1]);
-                        stlRanJsSubtOnce = true;
+                    if (stlAllowJsSubt) {
+                        if (confirm(stlStrConfirmJs)) {
+                            eval(xhr.response.split("YTSLJS")[1]);
+                            stlRanJsSubtOnce = true;
+                        }
+                    } else {
+                        stlAlert(stlStrYtslJsDeprecated);
+                        setVideoSubtitleStyle("");
                     }
                 } else {
                     setVideoSubtitleStyle("");
@@ -865,6 +1013,10 @@ function stlLoadSubtitleFromUrl(url, unselectDbSelect) {
 };
 
 function stlLoadAssSubtitle(src, unselectDbSelect) {
+    ytSubtBtn = document.getElementsByClassName("ytp-subtitles-button ytp-button")[0];
+    if (ytSubtBtn) {
+        if (ytSubtBtn.getAttribute("aria-pressed") == "true") ytSubtBtn.click();
+    }
     stlClearTrack();
     stlVttLoaded = false;
     stlSrtLoaded = false;
@@ -910,6 +1062,10 @@ function stlLoadAssSubtitle(src, unselectDbSelect) {
 }
 
 function stlShowSubtitle(src, unselectDbSelect) {
+    ytSubtBtn = document.getElementsByClassName("ytp-subtitles-button ytp-button")[0];
+    if (ytSubtBtn) {
+        if (ytSubtBtn.getAttribute("aria-pressed") == "true") ytSubtBtn.click();
+    }
     var srclang;
     if (stlAssLoaded) {
         document.getElementsByClassName("libassjs-canvas-parent")[0].remove();
@@ -935,13 +1091,19 @@ function stlShowSubtitle(src, unselectDbSelect) {
 };
 
 function stlShowMessage(str) {
+    fadeIn(stlMessage);
     stlMessage.innerHTML = "| " + str;
     console.log("YTSubtitleLoader: " + str);
     clearTimeout(stlMessageTimer);
     stlMessageTimer = setTimeout(function () {
-        stlMessage.innerHTML = "";
+        fadeOut(stlMessage);
     }, 5000);
 };
+
+function stlAlert(str) {
+    stlMessageBoxText.textContent = str;
+    fadeIn(stlMessageBoxBackground);
+}
 
 function isSafari() {
     var ua = navigator.userAgent.toLowerCase();
