@@ -8,7 +8,6 @@
 // @include     *://*.youtube.com/*
 // @author      YTSubtitleLoader
 // @connect     ytsubtitleloader.tk
-// @connect     ytsubs.org
 // @grant       none
 // @run-at      document-end
 // @noframes
@@ -556,7 +555,7 @@ function stlInitUi() {
             return;
         };
         if (!str.includes("http://") && !str.includes("https://")) {
-            str = stlServerUrl  + "/" + parseVideoId() + "/" + str;
+            str = stlServerUrl  + "/db/" + parseVideoId() + "/" + str;
             stlSubtSrcText.textContent = stlStrSubtSrc + ": YTSubtitleLoader DB";
         } else {
             stlSubtSrcText.textContent = stlStrSubtSrc + ": " + stlStrExternal;
