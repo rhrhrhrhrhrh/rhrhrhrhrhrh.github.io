@@ -8,6 +8,7 @@
 // @include     *://*.youtube.com/*
 // @author      YTSubtitleLoader
 // @connect     ytsubtitleloader.tk
+// @connect     ytsubs.org
 // @grant       none
 // @run-at      document-end
 // @noframes
