@@ -2,19 +2,20 @@
 // @name        YTSubtitleLoader
 // @namespace   https://ytsubtitleloader.tk/
 // @description Load custom subtitles / closed captions to YouTube
-// @version     2.1
+// @version     2.2
 // @downloadURL https://2.ytsubtitleloader.tk/ytsl.user.js
 // @updateURL   https://2.ytsubtitleloader.tk/ytsl.user.js
 // @include     *://*.youtube.com/*
 // @author      YTSubtitleLoader
 // @connect     ytsubtitleloader.tk
+// @connect     ytsubs.org
 // @grant       none
 // @run-at      document-end
 // @noframes
 // ==/UserScript==
 
 // Define strings
-var stlServerUrl = "https://ytsubtitleloader.tk",
+var stlServerUrl = "https://www.ytsubs.org",
     stlAssRendererUrl = "https://2.ytsubtitleloader.tk/AssRenderer/",
     stlStrUnsupported = "Run this script in YouTube video page. (desktop / mobile - iframe, embed, etc are not supported)",
     stlStrSelectVttFile = "Select a file",
@@ -555,7 +556,7 @@ function stlInitUi() {
             return;
         };
         if (!str.includes("http://") && !str.includes("https://")) {
-            str = "https://ytsubtitleloader.tk/db/" + parseVideoId() + "/" + str;
+            str = stlServerUrl  + "/" + parseVideoId() + "/" + str;
             stlSubtSrcText.textContent = stlStrSubtSrc + ": YTSubtitleLoader DB";
         } else {
             stlSubtSrcText.textContent = stlStrSubtSrc + ": " + stlStrExternal;
@@ -578,7 +579,7 @@ function stlInitUi() {
     stlDbSelect.disabled = true;
     stlDbSelect.onchange = function () {
         if (stlDbSelect.selectedIndex + 1 == stlDbSelect.length) {
-            window.open("https://ytsubtitleloader.tk/db?video=" + parseVideoId(), "_blank");
+            window.open(stlServerUrl + "/db?video=" + parseVideoId(), "_blank");
             stlDbSelect.selectedIndex = stlDbSelectPrevSelect;
         } else {
             stlLoadSubtitleFromDb();
