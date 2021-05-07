@@ -1,113 +1,126 @@
-// Define strings
-var stlServerUrl = "https://ytsubtitleloader.tk",
-    stlAssRendererUrl = "https://2.ytsubtitleloader.tk/AssRenderer/",
-    stlStrUnsupported = "Run this script in YouTube video page. (desktop / mobile - iframe, embed, etc are not supported)",
-    stlStrSelectVttFile = "Select a file",
-    stlStrSubtitleLoaded = "Subtitle loaded",
-    stlStrEnterSubtAddr = "Enter URL",
-    stlStrLoad = "Load",
-    stlStrApply = "Apply",
-    stlStrEmptyAddrAlert = "Enter a valid URL",
-    stlStrEnterFontSize = "Change font size",
-    stlStrEnterFontSizeDialog = "Enter desired font size (Default unit: px)",
-    stlStrFontSizeChanged = "Font size changed",
-    stlStrLoading = "Loading...",
-    stlStrRefresh = "Refresh",
-    stlStrUnload = "Unload",
-    stlStrUnloaded = "Subtitle unloaded",
-    stlStrNoSubt = "No subtitles",
-    stlStrServErr = "Server error",
-    stlStrReqTimeout = "Request timed out",
-    stlStrReqErr = "Request error",
-    stlStrNotSelected = "Not selected",
-    stlStrNoSubtLoaded = "No subtitle was loaded",
-    stlStrInvalidUrl = "Invalid subtitle URL",
-    stlStrAddSubt = "Add subtitle",
-    stlStrInvalidSubtFormat = "Invalid subtitle format",
-    stlStrCancel = "Cancel",
-    stlStrCanceled = "Canceled",
-    stlStrConfirmJs = "Do you want this subtitle to run JavaScript?\nThis allows the text to be styled, but it also poses security risks.",
-    stlStrSecondJsAlert = "JavaScripted subtitle was once loaded.\nTo use another JavaScripted subtitle properly, refresh the page.",
-    stlStrNotice = "Userscript version of YTSubtitleLoader which automatically loads to YouTube was released. Click OK to learn more.",
-    stlStrMenu = "Menu",
-    stlStrAutoLoadDb = "Auto load DB",
-    stlStrClearSettings = "Clear YTSL settings",
-    stlStrClose = "Close",
-    stlStrAssLoadFail = "Failed to load ASS renderer",
-    stlStrFontSizeUnchangeable = "This feature is currently unavailable for ASS/SSA subtitles.",
-    stlStrSrtConvFail = "Failed to load SRT converter",
-    stlStrPrivPolicy = "Privacy Policy",
-    stlStrOpenSrcLicense = "Open Source License",
-    stlStrSubtInfo = "About subtitle...",
-    stlStrSubtAuthor = "Subtitle author",
-    stlStrSubtAuthorComment = "Subtitle author's comment",
-    stlStrDownloadSubt = "Download subtitle",
-    stlStrSubtFormat = "Subtitle format",
-    stlStrNoInfo = "N/A",
-    stlStrSubtSrc = "Subtitle source",
-    stlStrFile = "Local file",
-    stlStrExternal = "External",
-    stlStrDone = "Done",
-    stlStrOk = "OK",
-    stlStrMobilePageAlert = "The support for the YouTube mobile page is currently incomplete. Would you like to switch to the desktop page?",
-    stlStrAssRenderLoaded = "ASS/SSA renderer loaded (further loading required)",
-    stlStrYtslJsDeprecated = "YTSLJS support has been dropped because of security and performance issues.";
+/* YTSubtitleLoader v2.3 (Bookmarklet) by RomanHue
+(C) 2021 RomanHue. All rights reserved.
+Licensed under the MIT License - https://github.com/rhrhrhrhrhrh/YTSubtitleLoader/blob/master/LICENSE */
 
-var userLang = new URL(location.href).searchParams.get("stlLangOverride") || navigator.language || navigator.userLanguage;
-if (userLang.includes("ko")) {
-    stlStrUnsupported = "유튜브 동영상 페이지(데스크탑/모바일)에서 실행하세요. (iframe, embed 등 미지원)",
-        stlStrSelectVttFile = "파일 선택",
-        stlStrSubtitleLoaded = "자막 로드됨",
-        stlStrEnterSubtAddr = "주소 입력",
-        stlStrLoad = "불러오기",
-        stlStrApply = "적용",
-        stlStrEmptyAddrAlert = "주소를 입력하세요.",
-        stlStrEnterFontSize = "글자 크기 변경",
-        stlStrEnterFontSizeDialog = "글자 크기 입력 (기본 단위: px)",
-        stlStrFontSizeChanged = "글자 크기 변경됨",
-        stlStrLoading = "로딩 중...",
-        stlStrRefresh = "새로고침",
-        stlStrUnload = "자막 제거",
-        stlStrUnloaded = "자막 제거됨",
-        stlStrNoSubt = "자막 없음",
-        stlStrServErr = "서버 오류",
-        stlStrReqTimeout = "요청 시간 초과",
-        stlStrReqErr = "요청 오류",
-        stlStrNotSelected = "선택 안함",
-        stlStrNoSubtLoaded = "로드된 자막이 없습니다.",
-        stlStrInvalidUrl = "잘못된 자막 URL",
-        stlStrAddSubt = "자막 추가",
-        stlStrInvalidSubtFormat = "올바르지 않은 자막 형식",
-        stlStrCancel = "취소",
-        stlStrCanceled = "취소됨",
-        stlStrConfirmJs = "이 자막이 자바스크립트를 실행하도록 허용하시겠습니까?\n이는 텍스트에 스타일을 적용할 수 있게 해주지만, 보안 문제를 야기할 수 있습니다.",
-        stlStrSecondJsAlert = "자바스크립트 사용 자막이 한번 로드되었습니다.\n다른 자바스크립트 사용 자막을 문제 없이 사용하려면, 페이지를 새로고침 하십시오.",
-        stlStrNotice = "유튜브에 자동으로 로드되는 YTSubtitleLoader의 유저스크립트 버전이 출시되었습니다. 자세히 알아보려면 확인 버튼을 누르세요.",
-        stlStrMenu = "메뉴",
-        stlStrAutoLoadDb = "DB 자동 로드",
-        stlStrClearSettings = "YTSL 설정값 초기화",
-        stlStrClose = "닫기",
-        stlStrAssLoadFail = "ASS 렌더러 로딩 실패",
-        stlStrFontSizeUnchangeable = "현재 ASS/SSA 자막에서는 사용할 수 없는 기능입니다.",
-        stlStrSrtConvFail = "SRT 컨버터 로딩 실패",
-        stlStrPrivPolicy = "개인정보 처리방침",
-        stlStrOpenSrcLicense = "오픈소스 라이선스",
-        stlStrSubtInfo = "자막 정보",
-        stlStrSubtAuthor = "자막 제작자",
-        stlStrSubtAuthorComment = "자막 제작자의 말",
-        stlStrDownloadSubt = "자막 다운로드",
-        stlStrSubtFormat = "자막 형식",
-        stlStrNoInfo = "없음",
-        stlStrSubtSrc = "자막 출처",
-        stlStrFile = "로컬 파일",
-        stlStrExternal = "외부",
-        stlStrDone = "완료",
-        stlStrOk = "확인",
-        stlStrMobilePageAlert = "현재 유튜브 모바일 페이지 지원은 불완전합니다. 데스크탑 페이지로 전환하시겠습니까?",
-        stlStrAssRenderLoaded = "ASS 렌더러 로드됨 (추가 로딩 필요)",
-        stlStrYtslJsDeprecated = "보안 및 성능 문제로 인해 YTSLJS는 지원 중단되었습니다.";
+// Define strings
+var stlServerUrl = "https://www.ytsubs.org",
+    stlAssRendererUrl = "https://2.ytsubtitleloader.tk/AssRenderer/";
+
+var stlStrings = {
+    Unsupported: "Run this script in YouTube video page. (desktop / mobile - iframe, embed, etc are not supported)",
+    SelectVttFile: "Select a file",
+    SubtitleLoaded: "Subtitle loaded",
+    EnterSubtAddr: "Enter URL",
+    Load: "Load",
+    Apply: "Apply",
+    EmptyAddrAlert: "Enter a valid URL",
+    EnterFontSize: "Change font size",
+    EnterFontSizeDialog: "Enter desired font size (Default unit: px)",
+    FontSizeChanged: "Font size changed",
+    Loading: "Loading...",
+    Refresh: "Refresh",
+    Unload: "Unload",
+    Unloaded: "Subtitle unloaded",
+    NoSubt: "No subtitles",
+    ServErr: "Server error",
+    ReqTimeout: "Request timed out",
+    ReqErr: "Request error",
+    NotSelected: "Not selected",
+    NoSubtLoaded: "No subtitle was loaded",
+    InvalidUrl: "Invalid subtitle URL",
+    AddSubt: "Add subtitle",
+    InvalidSubtFormat: "Invalid subtitle format",
+    Cancel: "Cancel",
+    Canceled: "Canceled",
+    ConfirmJs: "Do you want this subtitle to run JavaScript?\nThis allows the text to be styled, but it also poses security risks.",
+    SecondJsAlert: "JavaScripted subtitle was once loaded.\nTo use another JavaScripted subtitle properly, refresh the page.",
+    Notice: "Userscript version of YTSubtitleLoader which automatically loads to YouTube was released. Click OK to learn more.",
+    Menu: "Menu",
+    AutoLoadDb: "Auto load DB",
+    ClearSettings: "Clear YTSL settings",
+    Close: "Close",
+    AssLoadFail: "Failed to load ASS renderer",
+    FontSizeUnchangeable: "This feature is currently unavailable for ASS/SSA subtitles.",
+    SrtConvFail: "Failed to load SRT converter",
+    PrivPolicy: "Privacy Policy",
+    OpenSrcLicense: "Open Source License",
+    SubtInfo: "About subtitle...",
+    SubtAuthor: "Subtitle author",
+    SubtAuthorComment: "Subtitle author's comment",
+    DownloadSubt: "Download subtitle",
+    SubtFormat: "Subtitle format",
+    NoInfo: "N/A",
+    SubtSrc: "Subtitle source",
+    File: "Local file",
+    External: "External",
+    Done: "Done",
+    Ok: "OK",
+    MobilePageAlert: "The support for the YouTube mobile page is currently incomplete. Would you like to switch to the desktop page?",
+    AssRenderLoaded: "ASS/SSA renderer loaded (further loading required)",
+    YtslJsDeprecated: "YTSLJS support has been dropped because of security and performance issues.",
+    TermsOfUse: "Terms of Use"
 }
 
+// Localizations
+var userLang = new URL(location.href).searchParams.get("stlLangOverride") || navigator.language || navigator.userLanguage;
+if (userLang.includes("ko")) {
+    stlStrings = {
+        Unsupported: "유튜브 동영상 페이지(데스크탑/모바일)에서 실행하세요. (iframe, embed 등 미지원)",
+        SelectVttFile: "파일 선택",
+        SubtitleLoaded: "자막 로드됨",
+        EnterSubtAddr: "주소 입력",
+        Load: "불러오기",
+        Apply: "적용",
+        EmptyAddrAlert: "주소를 입력하세요.",
+        EnterFontSize: "글자 크기 변경",
+        EnterFontSizeDialog: "글자 크기 입력 (기본 단위: px)",
+        FontSizeChanged: "글자 크기 변경됨",
+        Loading: "로딩 중...",
+        Refresh: "새로고침",
+        Unload: "자막 제거",
+        Unloaded: "자막 제거됨",
+        NoSubt: "자막 없음",
+        ServErr: "서버 오류",
+        ReqTimeout: "요청 시간 초과",
+        ReqErr: "요청 오류",
+        NotSelected: "선택 안함",
+        NoSubtLoaded: "로드된 자막이 없습니다.",
+        InvalidUrl: "잘못된 자막 URL",
+        AddSubt: "자막 추가",
+        InvalidSubtFormat: "올바르지 않은 자막 형식",
+        Cancel: "취소",
+        Canceled: "취소됨",
+        ConfirmJs: "이 자막이 자바스크립트를 실행하도록 허용하시겠습니까?\n이는 텍스트에 스타일을 적용할 수 있게 해주지만, 보안 문제를 야기할 수 있습니다.",
+        SecondJsAlert: "자바스크립트 사용 자막이 한번 로드되었습니다.\n다른 자바스크립트 사용 자막을 문제 없이 사용하려면, 페이지를 새로고침 하십시오.",
+        Notice: "유튜브에 자동으로 로드되는 YTSubtitleLoader의 유저스크립트 버전이 출시되었습니다. 자세히 알아보려면 확인 버튼을 누르세요.",
+        Menu: "메뉴",
+        AutoLoadDb: "DB 자동 로드",
+        ClearSettings: "YTSL 설정값 초기화",
+        Close: "닫기",
+        AssLoadFail: "ASS 렌더러 로딩 실패",
+        FontSizeUnchangeable: "현재 ASS/SSA 자막에서는 사용할 수 없는 기능입니다.",
+        SrtConvFail: "SRT 컨버터 로딩 실패",
+        PrivPolicy: "개인정보 처리방침",
+        OpenSrcLicense: "오픈소스 라이선스",
+        SubtInfo: "자막 정보",
+        SubtAuthor: "자막 제작자",
+        SubtAuthorComment: "자막 제작자의 말",
+        DownloadSubt: "자막 다운로드",
+        SubtFormat: "자막 형식",
+        NoInfo: "없음",
+        SubtSrc: "자막 출처",
+        File: "로컬 파일",
+        External: "외부",
+        Done: "완료",
+        Ok: "확인",
+        MobilePageAlert: "현재 유튜브 모바일 페이지 지원은 불완전합니다. 데스크탑 페이지로 전환하시겠습니까?",
+        AssRenderLoaded: "ASS 렌더러 로드됨 (추가 로딩 필요)",
+        YtslJsDeprecated: "보안 및 성능 문제로 인해 YTSLJS는 지원 중단되었습니다.",
+        TermsOfUse: "이용 약관"
+    }
+}
+
+// Define variables
 var videoSubtitle = document.createElement("track");
 videoSubtitle.label = "YTSubtitleLoader";
 videoSubtitle.default = true;
@@ -126,8 +139,6 @@ var stlDbSelectPrevSelect = 0;
 
 var stlRanJsSubtOnce = false;
 
-var videoSubtitleStyle = document.createElement("style");
-videoSubtitleStyle.innerHTML = "::cue {  }";
 var stlLoop;
 var stlMessageBoxBackground, stlMessageBoxText;
 
@@ -143,35 +154,40 @@ var stlSubtFormat;
 var stlMinimized = localStorage.stlMinimized == "true", stlHidden = false;
 var stlAutoLoadDb = localStorage.stlDisableAutoLoadDb != "true";
 
-var stlVersion = "2.1", stlType = "b";
+var stlVersion = "2.3", stlType = "b";
 
 var stlAllowJsSubt = false;
 
-
+// Initialize the main UI
 stlInitUi();
 
 function stlInitUi() {
+    // If in the non-video YT page - detection by URL
     if (window.location.href.includes("youtube.com") && parseVideoId() === null) {
         stlLoop = setInterval(stlWaitForVideoPage, 500);
         console.log("YTSubtitleLoader: Video page not found... waiting for video page")
         return;
     }
 
+    // Look for the YT video element
     var playerContainer = document.getElementsByClassName("ytd-player")[0];
     var playerType = "desktop";
     if (!playerContainer) {
         playerContainer = document.getElementsByTagName("ytm-app")[0];
         playerType = "mobile";
         if (playerContainer) {
-            if (confirm(stlStrMobilePageAlert)) {
+            // Ask user to switch to more-compatible desktop page
+            if (confirm(stlStrings.MobilePageAlert)) {
                 location.href = location.href + "&app=desktop&persist_app=1";
             }
         } else {
+            // If in the non-video YT page - detection by video element presence
             if (window.location.href.includes("youtube.com")) {
                 stlLoop = setInterval(stlWaitForVideoPage, 500);
                 console.log("YTSubtitleLoader: Video not found... waiting for video page");
             } else {
-                alert(stlStrUnsupported);
+                // Abort if the script was loaded in webpages other than YT
+                alert(stlStrings.Unsupported);
             }
             return;
         };
@@ -180,72 +196,78 @@ function stlInitUi() {
     video = document.getElementsByTagName("video")[0];
     video.appendChild(videoSubtitle);
 
-    //prevVidId = parseVideoId();
-
+    // Defind YTSL CSS style
     var stlStyle = document.createElement("style");
     stlStyle.innerHTML =
-    '.stlLabel {\
-        float: left;\
-        font-size: 16px;\
-        margin-left: 2px;\
-        margin-right: 2px;\
-        color: var(--ytd-video-primary-info-renderer-title-color, var(--yt-spec-text-primary));\
+    '.stlLabel { \
+        float: left; \
+        font-size: 16px; \
+        margin-left: 2px; \
+        margin-right: 2px; \
+        color: var(--ytd-video-primary-info-renderer-title-color, var(--yt-spec-text-primary)); \
     }\
     .stlLink {\
-        color: inherit;\
-        text-decoration: none !important;\
+        color: inherit; \
+        text-decoration: none !important; \
     }\
     .stlButton {\
-        background: none !important;\
-        border: none;\
-        padding: 0 !important;\
-        margin-top: 0 !important;\
-        margin-bottom: 0 !important;\
-        cursor: pointer;\
+        background: none !important; \
+        border: none; \
+        padding: 0 !important; \
+        margin-top: 0 !important; \
+        margin-bottom: 0 !important; \
+        cursor: pointer; \
     }\
     ::cue {\
-        white-space: pre-wrap;\
-        background: rgba(8, 8, 8, 0.75) none repeat scroll 0% 0%;\
-        font-size: 33.0222px;\
-        color: #ffffff;\
-        fill: #ffffff;\
-        font-family: "YouTube Noto", Roboto, "Arial Unicode Ms", Arial, Helvetica, Verdana, "PT Sans Caption", sans-serif;\
+        white-space: pre-wrap; \
+        background: rgba(8, 8, 8, 0.75) none repeat scroll 0% 0%; \
+        font-size: 33.0222px; \
+        color: #ffffff; \
+        fill: #ffffff; \
+        font-family: "YouTube Noto", Roboto, "Arial Unicode Ms", Arial, Helvetica, Verdana, "PT Sans Caption", sans-serif; \
     }\
     .stlMenuItem {\
-        width: 150px;\
-        text-align: left;\
+        width: 150px; \
+        text-align: left; \
     }\
     .stlSubtInfoItem {\
-        width: 350px;\
+        width: 350px; \
     }\
     .stlWndBg {\
-        display: none;\
-        position: fixed;\
-        top: 0;\
-        left: 0;\
-        height: 100vh;\
-        width: 100vw;\
-        background: rgba(0, 0, 0, 0.5);\
-        z-index: 5000;\
+        display: none; \
+        position: fixed; \
+        top: 0; \
+        left: 0; \
+        height: 100vh; \
+        width: 100vw; \
+        background: rgba(0, 0, 0, 0.5); \
+        z-index: 5000; \
     }\
     .stlWnd {\
-        background: var(--yt-spec-general-background-a, white);\
-        position: absolute;\
-        top: 50%;\
-        left: 50%;\
-        padding: 12px;\
+        background: var(--yt-spec-general-background-a, white); \
+        position: absolute; \
+        top: 50%; \
+        left: 50%; \
+        padding: 12px; \
+        transform: translate(-50%, -50%); \
     }';
+    // Hack for Korean-English font difference
     if (userLang.includes("ko")) {
         stlStyle.innerHTML += ".stlLabelEngOnly { margin-top: 1px; }";
     }
     document.head.appendChild(stlStyle);
 
+    // CSS style for setting sub styles
+    var videoSubtitleStyle = document.createElement("style");
+    videoSubtitleStyle.innerHTML = "::cue {  }";
+    document.head.appendChild(videoSubtitleStyle);
+
+    // CSS style for setting sub font size
     var videoSubtitleStyleForFontSize = document.createElement("style");
     videoSubtitleStyleForFontSize.innerHTML = localStorage.stlFontSize || "::cue {  }";
     document.head.appendChild(videoSubtitleStyleForFontSize);
 
-    document.head.appendChild(videoSubtitleStyle);
-
+    // Create the YTSL UI
     var stlContainer = document.createElement("div");
     stlContainer.style.display = "block";
     if (!stlMinimized) playerContainer.appendChild(stlContainer);
@@ -259,7 +281,7 @@ function stlInitUi() {
 
     var stlMenu = document.createElement("div");
     stlMenu.className = "stlWnd";
-    stlMenu.style = "height: 150px; width: 150px; margin-top: -75px; margin-left: -75px;";
+    stlMenu.style = "height: 210px; width: 150px;";
     stlMenu.onclick = function (event) {
         event.stopPropagation();
     }
@@ -269,40 +291,39 @@ function stlInitUi() {
     stlMenuCloseBtn.textContent = "X";
     stlMenuCloseBtn.className = "stlLabel stlButton stlMenuItem";
     stlMenuCloseBtn.style = "float: right; width: auto; text-align: right; font-weight: bold;"
-    stlMenuCloseBtn.title = stlStrClose;
+    stlMenuCloseBtn.title = stlStrings.Close;
     stlMenuCloseBtn.onclick = function () {
         fadeOut(stlMenuBackground);
     };
     stlMenu.appendChild(stlMenuCloseBtn);
 
     var stlMenuTitle = document.createElement("p");
-    stlMenuTitle.textContent = stlStrMenu;
+    stlMenuTitle.textContent = stlStrings.Menu;
     stlMenuTitle.className = "stlLabel stlMenuItem";
     stlMenuTitle.style = "font-size: 20px; font-weight: bold; width: 80px !important;";
     stlMenu.appendChild(stlMenuTitle);
 
     var stlFontSizeInputBtn = document.createElement("button");
-    stlFontSizeInputBtn.textContent = stlStrEnterFontSize;
+    stlFontSizeInputBtn.textContent = stlStrings.EnterFontSize;
     stlFontSizeInputBtn.className = "stlLabel stlButton stlMenuItem";
     stlFontSizeInputBtn.onclick = function () {
         if (stlAssLoaded) {
-            stlAlert(stlStrFontSizeUnchangeable);
+            stlAlert(stlStrings.FontSizeUnchangeable);
             return;
         }
-        setTimeout(function () {
-            var str = prompt(stlStrEnterFontSizeDialog);
-            if (str == null) return;
-            videoSubtitleStyleForFontSize.innerHTML = "::cue { font-size: " + (isNaN(str) ? str : str + "px") + "; }";
-            localStorage.setItem("stlFontSize", videoSubtitleStyleForFontSize.innerHTML);
-            fadeOut(stlMenuBackground);
-            stlShowMessage(stlStrFontSizeChanged);
-        })
+        
+        var str = prompt(stlStrings.EnterFontSizeDialog);
+        if (str == null) return;
+        videoSubtitleStyleForFontSize.innerHTML = "::cue { font-size: " + (isNaN(str) ? str : str + "px") + "; }";
+        localStorage.setItem("stlFontSize", videoSubtitleStyleForFontSize.innerHTML);
+        fadeOut(stlMenuBackground);
+        stlShowMessage(stlStrings.FontSizeChanged);
     };
     stlMenu.appendChild(stlFontSizeInputBtn);
 
     var stlAutoLoadDbLabel = document.createElement("label");
     stlAutoLoadDbLabel.className = "stlLabel stlMenuItem";
-    stlAutoLoadDbLabel.textContent = stlStrAutoLoadDb;
+    stlAutoLoadDbLabel.textContent = stlStrings.AutoLoadDb;
     stlAutoLoadDbLabel.htmlFor = "stlAutoLoadDbChkBox";
     stlAutoLoadDbLabel.style.cursor = "pointer";
     stlMenu.appendChild(stlAutoLoadDbLabel);
@@ -319,7 +340,7 @@ function stlInitUi() {
     stlAutoLoadDbLabel.appendChild(stlAutoLoadDbChkBox);
 
     var stlClearSettingsBtn = document.createElement("button");
-    stlClearSettingsBtn.textContent = stlStrClearSettings;
+    stlClearSettingsBtn.textContent = stlStrings.ClearSettings;
     stlClearSettingsBtn.className = "stlLabel stlButton stlMenuItem";
     stlClearSettingsBtn.onclick = function () {
         localStorage.removeItem("stlNoticeIgnore");
@@ -327,7 +348,7 @@ function stlInitUi() {
         localStorage.removeItem("stlMinimized");
         localStorage.removeItem("stlFontSize");
         fadeOut(stlMenuBackground);
-        stlAlert(stlStrDone);
+        stlAlert(stlStrings.Done);
     };
     stlMenu.appendChild(stlClearSettingsBtn);
 
@@ -338,10 +359,19 @@ function stlInitUi() {
         window.open("https://github.com/rhrhrhrhrhrh/YTSubtitleLoader");
         fadeOut(stlMenuBackground);
     };
-    //stlMenu.appendChild(stlGitHubBtn);
+    stlMenu.appendChild(stlGitHubBtn);
+
+    var stlToUBtn = document.createElement("button");
+    stlToUBtn.textContent = stlStrings.TermsOfUse;
+    stlToUBtn.className = "stlLabel stlButton stlMenuItem";
+    stlToUBtn.onclick = function () {
+        window.open(stlServerUrl + "/termsofuse.php");
+        fadeOut(stlMenuBackground);
+    };
+    stlMenu.appendChild(stlToUBtn);
 
     var stlPrivPolBtn = document.createElement("button");
-    stlPrivPolBtn.textContent = stlStrPrivPolicy;
+    stlPrivPolBtn.textContent = stlStrings.PrivPolicy;
     stlPrivPolBtn.className = "stlLabel stlButton stlMenuItem";
     stlPrivPolBtn.onclick = function () {
         window.open(stlServerUrl + "/privacypolicy.php");
@@ -350,7 +380,7 @@ function stlInitUi() {
     stlMenu.appendChild(stlPrivPolBtn);
 
     var stlOpenSrcBtn = document.createElement("button");
-    stlOpenSrcBtn.textContent = stlStrOpenSrcLicense;
+    stlOpenSrcBtn.textContent = stlStrings.OpenSrcLicense;
     stlOpenSrcBtn.className = "stlLabel stlButton stlMenuItem";
     stlOpenSrcBtn.onclick = function () {
         window.open(stlServerUrl + "/opensource.php");
@@ -373,7 +403,7 @@ function stlInitUi() {
 
     var stlSubtInfoWindow = document.createElement("div");
     stlSubtInfoWindow.className = "stlWnd";
-    stlSubtInfoWindow.style = "height: 250px; width: 350px; margin-top: -125px; margin-left: -175px;";
+    stlSubtInfoWindow.style = "height: 250px; width: 350px;";
     stlSubtInfoWindow.onclick = function (event) {
         event.stopPropagation();
     }
@@ -383,14 +413,14 @@ function stlInitUi() {
     stlSubtInfoCloseBtn.textContent = "X";
     stlSubtInfoCloseBtn.className = "stlLabel stlButton stlMenuItem stlSubtInfoItem";
     stlSubtInfoCloseBtn.style = "float: right; width: auto; text-align: right; font-weight: bold;"
-    stlSubtInfoCloseBtn.title = stlStrClose;
+    stlSubtInfoCloseBtn.title = stlStrings.Close;
     stlSubtInfoCloseBtn.onclick = function () {
         fadeOut(stlSubtInfoBackground);
     };
     stlSubtInfoWindow.appendChild(stlSubtInfoCloseBtn);
 
     var stlSubtInfoTitle = document.createElement("p");
-    stlSubtInfoTitle.textContent = stlStrSubtInfo;
+    stlSubtInfoTitle.textContent = stlStrings.SubtInfo;
     stlSubtInfoTitle.className = "stlLabel stlMenuItem stlSubtInfoItem";
     stlSubtInfoTitle.style = "font-size: 20px; font-weight: bold; width: 200px !important;";
     stlSubtInfoWindow.appendChild(stlSubtInfoTitle);
@@ -414,7 +444,7 @@ function stlInitUi() {
     stlSubtInfoWindow.appendChild(stlSubtAuthorCommentText);
 
     var stlSubtDownloadBtn = document.createElement("buttton");
-    stlSubtDownloadBtn.textContent = stlStrDownloadSubt;
+    stlSubtDownloadBtn.textContent = stlStrings.DownloadSubt;
     stlSubtDownloadBtn.className = "stlLabel stlButton stlMenuItem stlSubtInfoItem";
     stlSubtDownloadBtn.style = "display: none; text-align: center; position: absolute; left: 12px; bottom: 12px;";
     stlSubtDownloadBtn.onclick = function () {
@@ -442,7 +472,7 @@ function stlInitUi() {
     stlMessageBoxCloseBtn.textContent = "X";
     stlMessageBoxCloseBtn.className = "stlLabel stlButton stlMenuItem";
     stlMessageBoxCloseBtn.style = "float: right; width: auto; text-align: right; font-weight: bold;"
-    stlMessageBoxCloseBtn.title = stlStrClose;
+    stlMessageBoxCloseBtn.title = stlStrings.Close;
     stlMessageBoxCloseBtn.onclick = function () {
         fadeOut(stlMessageBoxBackground);
     };
@@ -454,7 +484,7 @@ function stlInitUi() {
     stlMessageBox.appendChild(stlMessageBoxText);
 
     var stlMessageBoxOkBtn = document.createElement("buttton");
-    stlMessageBoxOkBtn.textContent = stlStrOk;
+    stlMessageBoxOkBtn.textContent = stlStrings.Ok;
     stlMessageBoxOkBtn.className = "stlLabel stlButton stlMenuItem";
     stlMessageBoxOkBtn.style = "text-align: center; width: 300px; position: absolute; left: 12px; bottom: 12px;";
     stlMessageBoxOkBtn.onclick = function () {
@@ -479,36 +509,38 @@ function stlInitUi() {
     stlFileInput.type = "file";
     stlFileInput.accept = ".vtt,.ass,.ssa,.srt";
     stlFileInput.style.display = "none";
-    stlFileInput.onchange = function () {
+    stlFileInput.onchange = function () { // Load the opened subtitle
         var reader = new FileReader();
         reader.onload = function () {
-            if (reader.result.includes("WEBVTT")) {
+            if (reader.result.includes("WEBVTT")) { // If VTT
+                // Load it as data URI
                 stlShowSubtitle("data:text/vtt," + encodeURIComponent(reader.result.split("YTSLJS")[0]), true);
+                // Deprecated YTSLJS (considered insecure and useless)
                 if (typeof reader.result.split("YTSLJS")[1] !== 'undefined') {
-                    if (stlRanJsSubtOnce) alert(stlStrSecondJsAlert);
+                    if (stlRanJsSubtOnce) alert(stlStrings.SecondJsAlert);
                     if (stlAllowJsSubt) {
-                        if (confirm(stlStrConfirmJs)) {
+                        if (confirm(stlStrings.ConfirmJs)) {
                             eval(reader.result.split("YTSLJS")[1]);
                             stlRanJsSubtOnce = true;
                         }
                     } else {
-                        stlAlert(stlStrYtslJsDeprecated);
+                        stlAlert(stlStrings.YtslJsDeprecated);
                         setVideoSubtitleStyle("");
                     }
                 } else {
                     setVideoSubtitleStyle("");
                 }
-                stlSubtSrcText.textContent = stlStrSubtSrc + ": " + stlStrFile;
-            } else if (reader.result.includes("[Script Info]")) {
+                stlSubtSrcText.textContent = stlStrings.SubtSrc + ": " + stlStrings.File;
+            } else if (reader.result.includes("[Script Info]")) { // If SSA/ASS
                 stlLoadAssSubtitle("data:text/plain," + encodeURIComponent(reader.result), true);
-                stlSubtSrcText.textContent = stlStrSubtSrc + ": " + stlStrFile;
-            } else if (reader.result.includes(" --> ")) {
+                stlSubtSrcText.textContent = stlStrings.SubtSrc + ": " + stlStrings.File;
+            } else if (reader.result.includes(" --> ")) { // If SRT
                 stlSrtLoaded = true;
                 stlShowSubtitle("data:text/vtt," + encodeURIComponent(srt2webvtt(reader.result)), true);
                 setVideoSubtitleStyle("");
-                stlSubtSrcText.textContent = stlStrSubtSrc + ": " + stlStrFile;
-            } else {
-                stlShowMessage(stlStrInvalidSubtFormat);
+                stlSubtSrcText.textContent = stlStrings.SubtSrc + ": " + stlStrings.File;
+            } else { // Invalid subtitle
+                stlShowMessage(stlStrings.InvalidSubtFormat);
             }
         };
         reader.readAsText(this.files[0]);
@@ -518,7 +550,7 @@ function stlInitUi() {
     stlContainer.appendChild(stlFileInput);
 
     var stlFileInputBtn = document.createElement("label");
-    stlFileInputBtn.textContent = stlStrSelectVttFile;
+    stlFileInputBtn.textContent = stlStrings.SelectVttFile;
     stlFileInputBtn.htmlFor = "stlFileInput";
     stlFileInputBtn.className = "stlLabel";
     stlFileInputBtn.style.cursor = "pointer";
@@ -531,19 +563,20 @@ function stlInitUi() {
     stlContainer.appendChild(stlSeparator);
 
     var stlUrlInputBtn = document.createElement("button");
-    stlUrlInputBtn.textContent = stlStrEnterSubtAddr;
+    stlUrlInputBtn.textContent = stlStrings.EnterSubtAddr;
     stlUrlInputBtn.className = "stlLabel stlButton";
     stlUrlInputBtn.onclick = function () {
-        var str = prompt(stlStrEnterSubtAddr);
+        var str = prompt(stlStrings.EnterSubtAddr);
         if (!str) {
-            if (str == "") stlShowMessage(stlStrEmptyAddrAlert);
+            if (str == "") stlShowMessage(stlStrings.EmptyAddrAlert);
             return;
         };
+        // Hidden feature: load any YTSL DB subtitles easily without having to type the full URL
         if (!str.includes("http://") && !str.includes("https://")) {
-            str = "https://ytsubtitleloader.tk/db/" + parseVideoId() + "/" + str;
-            stlSubtSrcText.textContent = stlStrSubtSrc + ": YTSubtitleLoader DB";
+            str = stlServerUrl + "/db/" + parseVideoId() + "/" + str;
+            stlSubtSrcText.textContent = stlStrings.SubtSrc + ": YTSubtitleLoader DB";
         } else {
-            stlSubtSrcText.textContent = stlStrSubtSrc + ": " + stlStrExternal;
+            stlSubtSrcText.textContent = stlStrings.SubtSrc + ": " + stlStrings.External;
         }
         stlLoadSubtitleFromUrl(str, true);
         if (stlMinimized && !stlHidden) playerContainer.appendChild(stlRestoreBtn);
@@ -563,7 +596,7 @@ function stlInitUi() {
     stlDbSelect.disabled = true;
     stlDbSelect.onchange = function () {
         if (stlDbSelect.selectedIndex + 1 == stlDbSelect.length) {
-            window.open("https://ytsubtitleloader.tk/db?video=" + parseVideoId(), "_blank");
+            window.open(stlServerUrl + "/db?video=" + parseVideoId(), "_blank");
             stlDbSelect.selectedIndex = stlDbSelectPrevSelect;
         } else {
             stlLoadSubtitleFromDb();
@@ -574,16 +607,16 @@ function stlInitUi() {
     stlContainer.appendChild(stlDbSelect);
 
     var stlDbSelectPlaceholder = document.createElement("option");
-    stlDbSelectPlaceholder.text = stlStrLoading;
+    stlDbSelectPlaceholder.text = stlStrings.Loading;
     stlDbSelectPlaceholder.disabled = true;
     stlDbSelect.appendChild(stlDbSelectPlaceholder);
     stlDbSelect.selectedIndex = 0;
 
     var stlDbSelectAddBtn = document.createElement("option");
-    stlDbSelectAddBtn.text = stlStrAddSubt;
+    stlDbSelectAddBtn.text = stlStrings.AddSubt;
 
     var stlDbRefreshBtn = document.createElement("button");
-    stlDbRefreshBtn.textContent = stlStrRefresh;
+    stlDbRefreshBtn.textContent = stlStrings.Refresh;
     stlDbRefreshBtn.className = "stlLabel stlButton";
     stlDbRefreshBtn.onclick = stlDbRefresh;
     stlContainer.appendChild(stlDbRefreshBtn);
@@ -591,7 +624,7 @@ function stlInitUi() {
     var stlDbSubtInfoBtn = document.createElement("button");
     stlDbSubtInfoBtn.textContent = " ⓘ ";
     stlDbSubtInfoBtn.className = "stlLabel stlButton";
-    stlDbSubtInfoBtn.onclick = function () {
+    stlDbSubtInfoBtn.onclick = function () { // Generate these info when opening this window
         if (stlDbSelect.selectedIndex != 0) {
             switch (stlDbSubtitles[stlDbSelect.selectedIndex - 1].type) {
                 case "ass":
@@ -606,12 +639,12 @@ function stlInitUi() {
                 case "srt":
                     stlSubtFormat = "SubRip Text";
             }
-            stlSubtSrcText.textContent = stlStrSubtSrc + ": YTSubtitleLoader DB";
+            stlSubtSrcText.textContent = stlStrings.SubtSrc + ": YTSubtitleLoader DB";
             var stlSubtAuthor = stlDbSubtitles[stlDbSelect.selectedIndex - 1].author;
-            stlSubtAuthorText.textContent = stlStrSubtAuthor + ": " + (stlSubtAuthor ? stlSubtAuthor : "N/A");
+            stlSubtAuthorText.textContent = stlStrings.SubtAuthor + ": " + (stlSubtAuthor ? stlSubtAuthor : "N/A");
             stlSubtAuthorText.style.display = "block";
             var stlSubtAuthorComment = stlDbSubtitles[stlDbSelect.selectedIndex - 1].authorComment;
-            stlSubtAuthorCommentText.textContent = stlStrSubtAuthorComment + ": " + (stlSubtAuthorComment ? stlSubtAuthorComment : stlStrNoInfo);
+            stlSubtAuthorCommentText.textContent = stlStrings.SubtAuthorComment + ": " + (stlSubtAuthorComment ? stlSubtAuthorComment : stlStrings.NoInfo);
             stlSubtAuthorCommentText.style.display = "block";
             stlSubtDownloadBtn.style.display = "block";
         } else {
@@ -623,9 +656,9 @@ function stlInitUi() {
             stlSubtDownloadBtn.style.display = "none";
         }
         if ((stlAssLoaded || stlVttLoaded || stlSrtLoaded) && typeof stlSubtFormat !== 'undefined') {
-            stlSubtFormatText.textContent = stlStrSubtFormat + ": " + stlSubtFormat;
+            stlSubtFormatText.textContent = stlStrings.SubtFormat + ": " + stlSubtFormat;
         } else {
-            stlSubtSrcText.textContent = stlStrNoSubtLoaded;
+            stlSubtSrcText.textContent = stlStrings.NoSubtLoaded;
             stlSubtFormatText.textContent = "";
         }
         fadeIn(stlSubtInfoBackground);
@@ -638,9 +671,9 @@ function stlInitUi() {
     stlContainer.appendChild(stlSeparator3);
 
     var stlUnloadBtn = document.createElement("button");
-    stlUnloadBtn.textContent = stlStrUnload;
+    stlUnloadBtn.textContent = stlStrings.Unload;
     stlUnloadBtn.className = "stlLabel stlButton";
-    stlUnloadBtn.onclick = function () {
+    stlUnloadBtn.onclick = function () { // Clear loaded subtitle
         if (stlAssLoaded) {
             document.getElementsByClassName("libassjs-canvas-parent")[0].remove();
             stlAssLoaded = false;
@@ -651,10 +684,10 @@ function stlInitUi() {
             stlSrtLoaded = false;
             changeYtVidTitle();
         } else {
-            stlShowMessage(stlStrNoSubtLoaded);
+            stlShowMessage(stlStrings.NoSubtLoaded);
             return;
         }
-        stlShowMessage(stlStrUnloaded);
+        stlShowMessage(stlStrings.Unloaded);
         stlDbSelect.selectedIndex = 0;
         stlDbSelectPrevSelect = stlDbSelect.selectedIndex;
         if (stlMinimized && !stlHidden) playerContainer.appendChild(stlRestoreBtn);
@@ -666,7 +699,7 @@ function stlInitUi() {
     stlContainer.appendChild(stlSeparator4);
 
     var stlMenuBtn = document.createElement("button");
-    stlMenuBtn.textContent = stlStrMenu;
+    stlMenuBtn.textContent = stlStrings.Menu;
     stlMenuBtn.className = "stlLabel stlButton";
     stlMenuBtn.onclick = function () {
         fadeIn(stlMenuBackground);
@@ -681,12 +714,13 @@ function stlInitUi() {
     }
     stlContainer.appendChild(stlMenuBtn);
     
+    // Currently nothing to notify
     var stlNotice = document.createElement("button");
     stlNotice.className = "stlButton stlLabel stlLabelEngOnly";
     stlNotice.style = "color: white; background: blue !important; border-radius: 50%; width: 20px; height: 20px;";
     stlNotice.textContent = "!";
     stlNotice.onclick = function () {
-        if (confirm(stlStrNotice)) {
+        if (confirm(stlStrings.Notice)) {
             window.open(stlServerUrl);
         } else {
             localStorage.setItem("stlNoticeIgnore", "1");
@@ -704,54 +738,57 @@ function stlInitUi() {
     stlMinimizeBtn.innerHTML = "<b><</b>";
     stlMinimizeBtn.style.marginLeft = "2px"
     stlMinimizeBtn.onclick = stlMinimize;
-    stlContainer.appendChild(stlMinimizeBtn);
+    stlContainer.appendChild(stlMinimizeBtn); // UI creation complete!
 
+    // Automatically load subtitles from YTSL DB if configured to do so
     if (stlAutoLoadDb) {
         stlLoadDb();
     } else {
-        stlDbSelectPlaceholder.text = stlStrNotSelected;
-        stlDbRefreshBtn.textContent = stlStrLoad;
+        stlDbSelectPlaceholder.text = stlStrings.NotSelected;
+        stlDbRefreshBtn.textContent = stlStrings.Load;
     }
 
+    // Detect YT URL change with interval loop, as I couldn't find a way to listen AJAX URL changes (without modifying the original page script)
     stlLoop = setInterval(stlDetectUrlChange, 200);
     setInterval(function () {
         if (stlMinimized && !stlHidden) playerContainer.appendChild(stlRestoreBtn);
         else if (!stlHidden) playerContainer.appendChild(stlContainer);
     }, playerType == "mobile" ? 10000 : 25000);
 
-    console.log("YTSubtitleLoader: Initialization complete");
+    console.log("YTSubtitleLoader: Initialization complete"); // Done!
 
+    // Function to get the list of subtitles from YTSL DB
     function stlLoadDb() {
         var xhr = new XMLHttpRequest();
         xhr.open("GET", stlServerUrl + "/db/" + parseVideoId() + "&t=" + stlType + stlVersion, true);
-        //xhr.timeout = 25000;
+        //xhr.timeout = 25000; // Disabled as old servers tended to be so slow
         xhr.send();
-        stlDbRefreshBtn.textContent = stlStrCancel;
+        stlDbRefreshBtn.textContent = stlStrings.Cancel;
         stlDbRefreshBtn.onclick = function () {
             xhr.abort();
-            stlDbSelectPlaceholder.text = stlStrCanceled;
-            stlDbRefreshBtn.textContent = stlStrRefresh;
+            stlDbSelectPlaceholder.text = stlStrings.Canceled;
+            stlDbRefreshBtn.textContent = stlStrings.Refresh;
             stlDbRefreshBtn.onclick = stlDbRefresh;
         };
         xhr.onload = function () {
-            stlDbRefreshBtn.textContent = stlStrRefresh;
+            stlDbRefreshBtn.textContent = stlStrings.Refresh;
             stlDbRefreshBtn.onclick = stlDbRefresh;
             if (xhr.status == 200) {
                 stlDbSelect.disabled = false;
-                stlDbSelectPlaceholder.text = stlStrNotSelected;
+                stlDbSelectPlaceholder.text = stlStrings.NotSelected;
                 stlDbSubtitles = JSON.parse(xhr.response);
                 var predefined = false, fullMatched = false;
-                for (var i = 0; i < stlDbSubtitles.length; i++) {
+                for (var i = 0; i < stlDbSubtitles.length; i++) { // Automatically select and load a subtitle based on the priority below
                     var def = false;
-                    if (stlDbSubtitles[i].default) { //Server admin defined priority
+                    if (stlDbSubtitles[i].default) { // Server admin defined priority
                         def = true;
                         predefined = true;
                     } else {
-                        if (stlDbSubtitles[i].langCode.toLowerCase() == userLang.toLowerCase() && !predefined) { //Full match e.g. ko-KR - ko-KR
+                        if (stlDbSubtitles[i].langCode.toLowerCase() == userLang.toLowerCase() && !predefined) { // Full match e.g. ko-KR - ko-KR
                             def = true;
                             fullMatched = true;
                         } else {
-                            if (stlDbSubtitles[i].langCode.substring(0, 2).toLowerCase() == userLang.substring(0, 2).toLowerCase() && !predefined && !fullMatched) { //Partial match e.g. ko-KR - ko
+                            if (stlDbSubtitles[i].langCode.substring(0, 2).toLowerCase() == userLang.substring(0, 2).toLowerCase() && !predefined && !fullMatched) { // Partial match e.g. ko-KR - ko
                                 def = true;
                             }
                         }
@@ -762,26 +799,27 @@ function stlInitUi() {
                 stlLoadSubtitleFromDb();
             } else if (xhr.status == 404) {
                 stlDbSelect.disabled = false;
-                stlDbSelectPlaceholder.text = stlStrNoSubt;
+                stlDbSelectPlaceholder.text = stlStrings.NoSubt;
                 stlDbSelect.appendChild(stlDbSelectAddBtn);
             } else {
-                stlDbSelectPlaceholder.text = stlStrServErr;
+                stlDbSelectPlaceholder.text = stlStrings.ServErr;
             };
         };
         xhr.ontimeout = function (e) {
             console.log("YTSubtitleLoader: " + e.message);
-            stlDbSelectPlaceholder.text = stlStrReqTimeout;
-            stlDbRefreshBtn.textContent = stlStrRefresh;
+            stlDbSelectPlaceholder.text = stlStrings.ReqTimeout;
+            stlDbRefreshBtn.textContent = stlStrings.Refresh;
             stlDbRefreshBtn.onclick = stlDbRefresh;
         };
         xhr.onerror = function (e) {
             console.log("YTSubtitleLoader: " + e.message);
-            stlDbSelectPlaceholder.text = stlStrReqErr;
-            stlDbRefreshBtn.textContent = stlStrRefresh;
+            stlDbSelectPlaceholder.text = stlStrings.ReqErr;
+            stlDbRefreshBtn.textContent = stlStrings.Refresh;
             stlDbRefreshBtn.onclick = stlDbRefresh;
         };
     };
 
+    // From https://stackoverflow.com/a/3452617
     function parseVideoId() {
         try {
             var video_id = window.location.search.split('v=')[1];
@@ -795,6 +833,7 @@ function stlInitUi() {
         }
     }
 
+    // Function to load a subtitle from the loaded DB
     function stlLoadSubtitleFromDb() {
         if (stlDbSelect.selectedIndex != 0) {
             videoSubtitle.srclang = stlDbSubtitles[stlDbSelect.selectedIndex - 1].langCode;
@@ -810,7 +849,7 @@ function stlInitUi() {
 
     function stlDbRefresh() {
         stlDbSelect.innerHTML = "";
-        stlDbSelectPlaceholder.text = stlStrLoading;
+        stlDbSelectPlaceholder.text = stlStrings.Loading;
         stlDbSelect.disabled = true;
         stlDbSelect.appendChild(stlDbSelectPlaceholder);
         stlDbSelect.selectedIndex = 0;
@@ -821,6 +860,7 @@ function stlInitUi() {
         else if (!stlHidden) playerContainer.appendChild(stlContainer);
     }
 
+    // Detect YT AJAX URL change with a interval loop
     function stlDetectUrlChange() {
         if (prevUrl != window.location.href) {
             setTimeout(function () {
@@ -835,13 +875,13 @@ function stlInitUi() {
                             stlDbRefresh();
                         } else {
                             stlDbSelect.innerHTML = "";
-                            stlDbSelectPlaceholder.text = stlStrNotSelected;
+                            stlDbSelectPlaceholder.text = stlStrings.NotSelected;
                             stlDbSelect.disabled = true;
                             stlDbSelect.appendChild(stlDbSelectPlaceholder);
                             stlDbSelect.selectedIndex = 0;
                             stlDbSelectPrevSelect = stlDbSelect.selectedIndex;
                             stlDbSelectAddBtn.selected = false;
-                            stlDbRefreshBtn.textContent = stlStrLoad;
+                            stlDbRefreshBtn.textContent = stlStrings.Load;
                         }
                     }
                     stlHidden = false;
@@ -861,6 +901,7 @@ function stlInitUi() {
         }
     }
 
+    // Start YTSL initialization upon loading a video page
     function stlWaitForVideoPage() {
         if ((document.getElementsByClassName("ytd-player")[0] || document.getElementsByTagName("ytm-app")[0]) && parseVideoId() !== null && document.getElementsByTagName("video")[0]) {
             setTimeout(stlInitUi, 2000);
@@ -869,6 +910,7 @@ function stlInitUi() {
         }
     }
 
+    // YTSL UI minimization with animation
     function stlMinimize() {
         stlMinimized = true;
         localStorage.setItem("stlMinimized", true);
@@ -913,7 +955,7 @@ function stlInitUi() {
                 }
             }
         }, 2);
-        var failSafeTimer = setTimeout(function() { //for laggy moments
+        var failSafeTimer = setTimeout(function() { // Fail safe for laggy moments (e.g. right after the page load)
             clearInterval(interval);
             tempContainer.remove();
             stlRestoreBtn.style.display = "block";
@@ -930,6 +972,7 @@ function stlInitUi() {
         fadeIn(stlContainer);
     }
 
+    // Middle-click the menu button to activate this
     function stlDbg(fn) {
         if (typeof fn !== 'undefined') {
             fn();
@@ -938,35 +981,39 @@ function stlInitUi() {
         }
     }
 
+    // Run this function from the above debug function if you need
     function stlReInit() {
         stlContainer.remove();
         stlInitUi();
     }
-}
+} // End of stlInitUi function
+// The below functions were located out of this function to provide API for embedding YTSL with YT iframe - which is currently not a supported feature
 
+// This was a function for use in YTSLJS...
 function setVideoSubtitleStyle(style) {
     videoSubtitleStyle.innerText = "::cue { " + style + " };"
 }
 
 function stlLoadSubtitleFromUrl(url, unselectDbSelect) {
-    stlShowMessage(stlStrLoading);
+    stlShowMessage(stlStrings.Loading);
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
     xhr.timeout = 25000;
     xhr.send();
     xhr.onload = function () {
         if (xhr.status == 200) {
+            // See stlFileInput.onchange for comments
             if (xhr.response.includes("WEBVTT")) {
                 stlShowSubtitle("data:text/vtt," + encodeURIComponent(xhr.response.split("YTSLJS")[0]), unselectDbSelect)
                 if (typeof xhr.response.split("YTSLJS")[1] !== 'undefined') {
-                    if (stlRanJsSubtOnce) alert(stlStrSecondJsAlert);
+                    if (stlRanJsSubtOnce) alert(stlStrings.SecondJsAlert);
                     if (stlAllowJsSubt) {
-                        if (confirm(stlStrConfirmJs)) {
+                        if (confirm(stlStrings.ConfirmJs)) {
                             eval(xhr.response.split("YTSLJS")[1]);
                             stlRanJsSubtOnce = true;
                         }
                     } else {
-                        stlAlert(stlStrYtslJsDeprecated);
+                        stlAlert(stlStrings.YtslJsDeprecated);
                         setVideoSubtitleStyle("");
                     }
                 } else {
@@ -979,24 +1026,25 @@ function stlLoadSubtitleFromUrl(url, unselectDbSelect) {
                 stlShowSubtitle("data:text/vtt," + encodeURIComponent(srt2webvtt(xhr.response)), unselectDbSelect);
                 setVideoSubtitleStyle("");
             } else {
-                stlShowMessage(stlStrInvalidSubtFormat);
+                stlShowMessage(stlStrings.InvalidSubtFormat);
             }
         } else if (xhr.status == 404) {
-            stlShowMessage(stlStrInvalidUrl);
+            stlShowMessage(stlStrings.InvalidUrl);
         } else {
-            stlShowMessage(stlStrServErr);
+            stlShowMessage(stlStrings.ServErr);
         };
     };
     xhr.ontimeout = function (e) {
         console.log("YTSubtitleLoader: " + e.message);
-        stlShowMessage(stlStrReqTimeout);
+        stlShowMessage(stlStrings.ReqTimeout);
     };
     xhr.onerror = function (e) {
         console.log("YTSubtitleLoader: " + e.message);
-        stlShowMessage(stlStrReqErr);
+        stlShowMessage(stlStrings.ReqErr);
     };
 };
 
+// Load JavascriptSubtitlesOctopus for ASS rendering
 function stlLoadAssSubtitle(src, unselectDbSelect) {
     ytSubtBtn = document.getElementsByClassName("ytp-subtitles-button ytp-button")[0];
     if (ytSubtBtn) {
@@ -1038,7 +1086,7 @@ function stlLoadAssSubtitle(src, unselectDbSelect) {
         stlAssInstance = new SubtitlesOctopus(options);
         stlAssLoaded = true;
     }
-    stlShowMessage(stlStrAssRenderLoaded);
+    stlShowMessage(stlStrings.AssRenderLoaded);
     if (unselectDbSelect || typeof unselectDbSelect === 'undefined') {
         stlDbSelect.selectedIndex = 0;
         stlDbSelectPrevSelect = stlDbSelect.selectedIndex;
@@ -1046,6 +1094,7 @@ function stlLoadAssSubtitle(src, unselectDbSelect) {
     }
 }
 
+// Function to load subtitles to the YT video
 function stlShowSubtitle(src, unselectDbSelect) {
     ytSubtBtn = document.getElementsByClassName("ytp-subtitles-button ytp-button")[0];
     if (ytSubtBtn) {
@@ -1064,7 +1113,7 @@ function stlShowSubtitle(src, unselectDbSelect) {
     videoSubtitle.src = src;
     if (srclang) videoSubtitle.srclang = srclang;
     video.appendChild(videoSubtitle);
-    stlShowMessage(stlStrSubtitleLoaded);
+    stlShowMessage(stlStrings.SubtitleLoaded);
     videoSubtitle.track.mode = "showing";
     if (unselectDbSelect || typeof unselectDbSelect === 'undefined') {
         stlDbSelect.selectedIndex = 0;
@@ -1075,6 +1124,7 @@ function stlShowSubtitle(src, unselectDbSelect) {
     else stlVttLoaded = true, stlSrtLoaded = false;
 };
 
+// Function to show simple messages next to the STL UI
 function stlShowMessage(str) {
     fadeIn(stlMessage);
     stlMessage.innerHTML = "| " + str;
@@ -1085,24 +1135,13 @@ function stlShowMessage(str) {
     }, 5000);
 };
 
+// Function to show a non-blocking modal alert
 function stlAlert(str) {
     stlMessageBoxText.textContent = str;
     fadeIn(stlMessageBoxBackground);
 }
 
-function isSafari() {
-    var ua = navigator.userAgent.toLowerCase();
-    if (ua.indexOf('safari') != -1) {
-        if (ua.indexOf('chrome') > -1) {
-            return false;
-        } else {
-            return true;
-        }
-    } else {
-        return false;
-    }
-}
-
+// Functions to perform a fade-in/out animations for elements 
 function fadeIn(elem) {
     var i = 0.1;
     elem.style.opacity = i;
@@ -1140,6 +1179,7 @@ function fadeOut(elem) {
     }, 500);
 }
 
+// Change the YT video's title - currently a YTSL DB-only feature
 function changeYtVidTitle(str) {
     if (typeof str !== 'undefined') {
         titleContainer = document.getElementsByClassName("title style-scope ytd-video-primary-info-renderer")[0];
@@ -1178,6 +1218,7 @@ function changeYtVidTitle(str) {
     }
 }
 
+// Unload the subtitle - have to do this long to support many browsers
 function stlClearTrack() {
     videoSubtitle.track.mode = "disabled";
     videoSubtitle.remove();
@@ -1188,7 +1229,7 @@ function stlClearTrack() {
     video.appendChild(videoSubtitle);
 }
 
-/* From https://github.com/silviapfeiffer/silviapfeiffer.github.io/blob/master/index.html */
+// From https://github.com/silviapfeiffer/silviapfeiffer.github.io/blob/master/index.html - convert SRT data to VTT
 function srt2webvtt(data) {
     // remove dos newlines
     var srt = data.replace(/\r+/g, '');
